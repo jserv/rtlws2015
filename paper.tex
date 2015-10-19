@@ -1,0 +1,183 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[english]{babel}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{url,hyperref,graphicx,float,times}
+\usepackage{sectsty}
+
+\renewcommand{\refname}{}
+
+\setlength{\paperheight}{297mm}
+\setlength{\paperwidth}{210mm}
+\setlength{\voffset}{-12mm}
+\setlength{\topmargin}{0mm}
+\setlength{\headsep}{8mm}
+\setlength{\headheight}{10mm}
+\setlength{\textheight}{235mm}
+\setlength{\hoffset}{-4mm}
+\setlength{\textwidth}{166mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\marginparwidth}{0mm}
+\setlength{\marginparpush}{0mm}
+\setlength{\columnsep}{6mm}
+\setlength{\parindent}{6mm}
+\setlength{\parskip}{2mm}
+
+%% insert eps pictures
+%% use as \epsin{epsfile}{width_in_mm}{label}{caption}
+\usepackage{epsfig}
+\newcounter{figcounter}
+\def\epsin #1#2#3#4{
+\refstepcounter{figcounter} \label{#3}
+\[
+\mbox{
+  \epsfxsize=#2mm
+  \epsffile{#1.eps}
+}
+\]
+%\vspace{0mm}
+\begin{center}
+  \parbox{7cm}{{\bf FIGURE \arabic{figcounter}:}\quad {\it #4 } } \\
+\end{center}
+}
+
+%% insert table
+%% use as \tabin{size_in_mm}{label}{caption}{table_data}
+\newcounter{tabcounter}
+\def\tabin #1#2#3#4{
+\refstepcounter{tabcounter} \label{#2}
+\[ \makebox[#1mm][c]{#4} \]
+%\vspace{0mm}
+\begin{center}
+  \parbox{7cm}{{\bf TABLE \arabic{tabcounter}:}\quad {\it #3 } } \\
+\end{center}
+}
+
+\title{\LARGE
+Performance Evaluation of Xenomai 3
+}
+
+\author{\large
+{\bf Ching-Chun (Jim) Huang }\\
+Department of Computer Science and Information Engineering, \\
+National Cheng Kung University, Taiwan\\
+No.1, University Road, Tainan City 701, Taiwan (R.O.C.)\\
+\vspace{8mm}
+jserv$@$ccns.ncku.edu.tw\\
+{\bf Chan-Hsiang Lin}\\
+Department of Electrical and Electronic Engineering, National Taiwan University\\
+No.1, Sec. 4, Roosevelt Road, Taipei, Taiwan (R.O.C.)\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% E-MAIL (REQUIRED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+??\\
+}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Xenomai 3 is the new architecture of the real-time framework running seamlessly side-by-side Linux as a dual-kernel system like Xenomai 2, or natively over mainline Linux kernels supplemented by the PREEMPT\_RT efforts to meet stricter response time requirements than standard kernel preemption would bring. In this presentation, we will evaluate the performances of Xenomai 3 running with both configurations and analyze the various benchmarks for ARM Cortex-A series. Xenomai 3 introduces some optimizations over RTOS API emulation, thread-to-thread communications, and significantly lower overhead with dual-kernel configurations. The comprehensive performance comparisons illustrate the major evolution of Xenomai 3 along with the revised Real-Time Driver Model (RTDM) which provides a unified interface over both PREEMPT\_RT and dual-kernel.
+
+This paper would be a report on performance measurements among upstream Linux real-time enhancements and Xenomai official stable release (both version 2 and 3 series), and and the benchmarks show that the maximum response time to external interrupts of the dual kernel configurations for Xenomai 3 is almost twice as PPREEMPT\_RT, that more predictable handling on multiple incoming interrupts where Xenomai 3 supports both configurations interchangeably.
+\end{abstract}
+
+\vspace{10mm}
+
+\begin{multicols}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION (REQUIRED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+Historically speaking, there are two typical approaches to modifying the standard Linux kernel into a real-time kernel. The first uses an extra small real-time executive \cite{rtai} or microkernel \cite{sel4} which runs the para-virtualized Linux kernel as a task. The small real-time executive takes control over the system for real-time processes and is responsible for scheduling real-time tasks, interrupt handling and scheduling Linux. With these changes it is possible to let a real-time task run on the CPU without the Linux kernel being able to interrupt the task. As the Linux kernel is run as a task it is preemptive at any time.
+
+With the second approach, changes are made the Linux kernel in order to be real-time. This include changes as real-time
+scheduling and adding preemption to the kernel.
+
+In this section we briefly present the Xenomai real-time framework for Linux, and the Adaptive Domain Environment for Operating System (Adeos) layer, which allows Xenomai and Linux to run on the same hardware platform.
+
+To provide an objective metric, we run processes on the test system, but measure their performance using an external measurement system which runs a C program on bare metal.
+
+\subsection{Adeos layer}
+
+\textit{Adeos} is a resource virtualization layer, allowing multiple entities called \textit{domains}, that can be seen as complete operating systems, to run  simultaneously on the same hardware platform.
+
+Adeos domains can compete with each other for receiving system generated \textit{events}. Those events can be incoming external (or virtually generated) interruptions, Linux system calls invocations, or various kernel-code-related events like context switches. Adeos introduces the \textit{event pipeline}, which can be seen as a chain of domains of decreasing priority. The events are consequently propagated throughout the pipeline, distributed firstly to the utmost priority domain, then distributed to lower priority domains.
+
+In the case of a Xenomai RTOS running with a Linux kernel, the Adeos pipeline and the organization of the domains is depicted in Figure "EventPipeline". In the pipeline,  we can see that Xenomai has the highest priority, so it can handle and manage first the events before passing them to the Linux kernel. The events can also be blocked by the interrupt shield, preserving the real-time framework from latencies due to event management by the Linux kernel. Throughout this mechanism, Xenomai framework can provide real-time guarantees.
+
+\subsection{Xenomai}
+
+Xenomai provides a kernel-based Application Programming Interface (API) for real-time applications. A user-land API is also available, at the cost of longer latencies. Xenomai introduces the concept of \textit{skins}. Skins are source codes emulating proprietary APIs used for porting real-time applications from various RTOSs such as \textit{VxWorks}, \textit{pSOS}, etc. to Xenomai. When designing a Xenomai application from scratch, the \textit{native} Xenomai skin can be used.
+
+All Xenomai skins rely on the \textit{nucleus}, the core of the RTOS, implementing all algorithms for real-time functionalities. Xenomai provides all standard services one can expect to find in a RTOS: task management, multiple scheduling algorithms, IPCs, etc.
+
+\subsection{Time management in Xenomai}
+We focused in this project on periodic real-time tasks that make extensive use of timers. A commonly used skeleton for those tasks in Xenomai as follows :
+
+%\vspace{-0.5cm}
+\begin{verbatim}
+void myRealTimeTask(void *arg) {
+  SetPeriodic(myself, period);
+  while(1) {
+    /* Do something */
+    wait_period();
+  }
+}
+\end{verbatim}
+%\vspace{-0.5cm}
+
+The \verb+SetPeriodic()+ function creates and starts a timer related to the calling task, with a period (in clock ticks) equals to the specified parameter. The global tick management function notifies the timer each time a clock tick occurs. When reaching wake up time, the timer executes a handler placing the task in the ready state.
+
+The Gnublin mascot is the quadratic little man, adverting to the 
+7x7 cm board dimensions (fig. \ref{fig-maennchen}).
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=3cm]{img/gnublin-maennchen.jpg}
+\caption{The Gnublin mascot.}
+\label{fig-maennchen}
+\end{center}
+\end{figure}
+
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{Multi-Row} &
+\multicolumn{2}{c|}{Multi-Column} &
+\multicolumn{2}{c|}{\multirow{2}{*}{Multi-Row and Col}} \\
+\cline{2-3}
+  & column-1 & column-2 & \multicolumn{2}{c|}{} \\
+\hline
+label-1 & label-2 & label-3 & label-4 & label-5 \\
+\hline
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% NEXT SECTION (OPTIONAL)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hardware System Structure}
+Hardware structure of the recorder is shown as figure 1.The medium of data storage is several 10000RPM SCSI hard disks constituting RAID5.Hardware is based on 64-bit PCI bus, and Software is based on RTLinux and XFS.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% FIGURES ARE HANDLED LIKE THIS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% the figure will be in file rt-tux.eps and will occupy 75mm on the page
+\epsin{hsr}{80}{fig1:f1}{Hardware structure of Recorder}
+
+\section{Conclusions}
+The trait of real time in RTLinux is closely related to hardware, So we can take full advantage of PC. The testing on our recorder showed that the average of interrupt response time is 10us, and the max  is 15us. This performance can satisfy this real time requirement of recorder completely and guarantee data integrity. With the high-performance and  great capacity hard disk using, the capacity of the RAID would reach over 1000GB, moreover, collected data don't loss even if one hard disk is demaged.
+
+We had done the test that  under the same hard platform, the recording speed has significantly enhanced in RTLinux than in Windows NT. RTLinux is free, open source, retractile, and transferable, so many OS can not bear comparison with it. RTLinux has been applied successful in our pre-demodulation Digital Recorder; moreover, it will be more widely used in the field of real-time control.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}%use this if you have <=9 bib refs
+	\bibitem {rtai}{\it https://www.rtai.org/}
+	\bibitem {sel4}{\it http://ssrg.nicta.com.au/projects/seL4/}
+\end{thebibliography}
+
+\end{multicols}
+\end{document}
