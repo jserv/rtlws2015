@@ -71,7 +71,7 @@ No.1, Sec. 4, Roosevelt Road, Taipei, Taiwan (R.O.C.)\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% E-MAIL (REQUIRED)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-??\\
+r04943031$@$ntu.edu.tw
 }
 \date{}
 
@@ -157,6 +157,7 @@ label-1 & label-2 & label-3 & label-4 & label-5 \\
 \hline
 \end{tabular}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% NEXT SECTION (OPTIONAL)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -167,6 +168,106 @@ Hardware structure of the recorder is shown as figure 1.The medium of data stora
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% the figure will be in file rt-tux.eps and will occupy 75mm on the page
 \epsin{hsr}{80}{fig1:f1}{Hardware structure of Recorder}
+
+
+\section{Experiment}
+
+\subsection{Purpose}
+1. Compare the performance of Xenomai with baseline Linux kernel and PREEMPT\_RT patched kernel
+2. Compare the performance of Xenomai-2 and Xenomai-3
+\subsection{Environment Setup}
+
+\subsubsection{Hardware}
+BeagleBone Black, an effective embedded platform with ARM Cortex-A8 processor, capable of running Linux and Xenomai (both 2 and 3), consisting of a single processor, a 512 MB memory, 32kB L1 caches and a 256kB L2 cache.  
+
+\subsubsection{Kernel}
+A Linux kernel that can be patched with PREEMPT\_RT, Xenomai 2 and Xenomai 3 is needed for the experiment (Xenomai 3 has to run on Linux kernel 3.10 or later versions). We selected Linux 3.18 for our experiment. In some cases when the patches couldn't be successfully applied on the kernel, we tried to resolve the conflicts manually.
+  
+\subsubsection{Kernel configuration [ipipe]}
+Some of the kernel conﬁguration options may have an impact on real-time latencies. These options include Power Management, especially CPU frequency scaling, value of HZ, NUMA conﬁguration and so on. Additionally, most debug options (Kernel hacking section) lead to increased latencies. We disabled these config options before compilation.
+
+\subsubsection{Pre-experiment Settings}
+We tried to measure the latencies under 2 conditions - IDLE and CPU-STRESSED. In the IDLE experiment, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also killed, and we used the 'stress' command to keep the CPU busy. The command to kill these processes are written in the test script.
+
+  The gravity values is the shortest time the platform needs to deliver an IRQ to a Xenomai interrupt handler,  a RTDM task running in kernel space, or a user-space task. It is used to differentiate timers on the target context they activate, among IRQ(handler), kernel and user threads, anticipating the next timer shot accordingly, so that such context is activated as close as possible to the ideal time. The gravity values can be set in the file `/proc/xenomai/latency` on Xenomai-2, `/proc/xenomai/clock/coreclk` on Xenomai-3 with root privilege. Furthermore, Xenomai-3 has an autotune function that runs a series of internal calibration tests for estimating the most appropriate gravity values for its real-time clock timer, retaining the final values.
+Because Xenomai-2 doesn't have an autotune function and it has only one gravity value for all the 
+coreclocks, we decided to manually tune all the coreclock values in both Xenomai-2 and Xenomai-3 to zero, so that we can later compare the results on the same basis. 
+
+In our experiments, the kernel build were stored in different SD cards. The fact that different external storage devices have different access specs could affect the result. In order to eliminate the uncertainties, and for the sake of preventing the test process's pages being swapped into disk, we locked all the test process's pages inside memory. In cyclictest, this achieved by specifying the '-m' option in the command. On the other hand, latency is already executed in a memory locked condition.
+
+\subsection{Testing Process}
+
+\subsubsection{Scenario}
+The goal of the experiment is to evaluate the realtime performances of Mainline Linux, PREEMPT\_RT, 
+Xenomai-2 and Xenomai-3. Also, we want to find out whether the newly released Xenomai-3.0 has improved in realtime capability, compared to Xenomai-2.6.4, the latest stable version of Xenomai-2.
+\subsubsection{Tools}
+Cyclictest is a commonly-used latency benchmark. It is compatible with all the kernel setups we use (the recently Xenomai-3.0 release add cyclictest to its testsuite), therefore it's suitable for the purpose of measuring latencies for all setups.
+Latency is a test program for the Xenomai test suite. It can measure latencies under 3 modes - user task, kernel task, or timer IRQ. It launches the test procedure in one of the user-specified contexts. In the user mode, the measurement task is handled by the 'latency' function in the program, which periodically waits and fetches the current time when resuming. Latency is then measured by calculating the difference of the actual time elapsed with the predefined period.
+\subsubsection{Test Procedure}
+Each experiment was run on the same hardware. Each was run for 20 minutes to generate approximately 1,000,000 samples. Test scripts were written to facilitate the experiment process.
+\subsubsection{Test Load}
+As previously mentioned, we measure latencies under IDLE and CPU-STRESSED conditions. In the CPU-STRESSED condition, we called the "stress" process to exert pressure on the CPU.
+\subsection{Experiment Result}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/cyclictest_idle.jpg}
+\caption{Cyclictest with no stress.}
+\label{cyclictest-idle}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/cyclictest_stress.jpg}
+\caption{Cyclictest with stress.}
+\label{cyclictest-tress}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/latency_idle.jpg}
+\caption{Latency with no stress.}
+\label{latency-idle}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/latency_stress.jpg}
+\caption{Latency with no stress.}
+\label{latency-stress}
+\end{center}
+\end{figure}
+
+\epsin{cyclic-idle}{80}{fig2:f2}{Cyclictest Idle}
+\epsin{cyclic-cpu}{80}{fig3:f3}{Cyclictest stressed}
+
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|c|r|r|c|r|r|c|r|r|}
+\hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{user} & \multicolumn{3}{c|}{kernel} & \multicolumn{3}{c|}{timer-irq} \\ \cline{2-10} 
+ & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} \\ \hline
+Xenomai 2 & \multicolumn{1}{r|}{8.541} & 9.458 & 34.583 & \multicolumn{1}{r|}{6.965} & 7.708 & 27.821 & \multicolumn{1}{r|}{2.129} & 2.654 & 11.343 \\ \hline
+Xenomai 3 & \multicolumn{1}{r|}{8.043} & 8.853 & 33.023 & \multicolumn{1}{r|}{5.567} & 6.479 & 25.577 & \multicolumn{1}{r|}{2.586} & 3.079 & 10.031 \\ \hline
+\end{tabular}
+}
+
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{idle} & \multicolumn{3}{c|}{cpu-stressed} \\ \cline{2-7} 
+ & \multicolumn{1}{l|}{min} & \multicolumn{1}{l|}{avg} & \multicolumn{1}{l|}{max} & \multicolumn{1}{l|}{min} & \multicolumn{1}{l|}{avg} & \multicolumn{1}{l|}{max} \\ \hline
+Mainline Linux & 39 & 43 & 1046 & 39 & 52 & 1097 \\ \hline
+Preempt-RT & 16 & 21 & 52 & 18 & 25 & 62 \\ \hline
+Xenomai 2 & 8 & 9 & 41 & 8 & 19 & 45 \\ \hline
+Xenomai 3 & 7 & 7 & 35 & 6 & 16 & 37 \\ \hline
+\end{tabular}
+
+
+From the data above, it shows that the latency performance of timer-irq in CPU-STRESSED situation is slightly worse on Xenomai-3(over 3 us) than on Xenomai-2(below 3 us). While this is not an occasional case(the same experiment was ran a couple times), we tried to look into the test code of latency to figure out the cause of this phenomenon.
+
+\subsection{Experiment Result Analysis}
+Our data shows that the average user-level latency in either Xenomai 2 or 3 is around 9 us in idle situation, 18 us in stressed situation. And in the worse case, the latency is below 50 us. Meanwhile, the latency of PREEMPT\_RT has a user-level latency more than 20 us and can't guarantee a 50 us max latency (Actually in some cases the latency will exceed 100 us in stressed condition).  As for mainline Linux, the max latency easily exceeds 1 ms. When comparing the performance of Xenomai-3 to Xenomai-2, we can see that the stats in cyclictest and latency test is slightly better, except for the case of timer-irq latency in stressed condition.
 
 \section{Conclusions}
 The trait of real time in RTLinux is closely related to hardware, So we can take full advantage of PC. The testing on our recorder showed that the average of interrupt response time is 10us, and the max  is 15us. This performance can satisfy this real time requirement of recorder completely and guarantee data integrity. With the high-performance and  great capacity hard disk using, the capacity of the RAID would reach over 1000GB, moreover, collected data don't loss even if one hard disk is demaged.
