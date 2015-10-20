@@ -247,24 +247,35 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 \epsin{cyclic-idle}{80}{fig2:f2}{Cyclictest Idle}
 \epsin{cyclic-cpu}{80}{fig3:f3}{Cyclictest stressed}
 
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{|l|c|r|r|c|r|r|c|r|r|}
-\hline
-\multirow{2}{*}{} & \multicolumn{3}{c|}{user} & \multicolumn{3}{c|}{kernel} & \multicolumn{3}{c|}{timer-irq} \\ \cline{2-10} 
- & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} \\ \hline
-Xenomai 2 & \multicolumn{1}{r|}{8.541} & 9.458 & 34.583 & \multicolumn{1}{r|}{6.965} & 7.708 & 27.821 & \multicolumn{1}{r|}{2.129} & 2.654 & 11.343 \\ \hline
-Xenomai 3 & \multicolumn{1}{r|}{8.043} & 8.853 & 33.023 & \multicolumn{1}{r|}{5.567} & 6.479 & 25.577 & \multicolumn{1}{r|}{2.586} & 3.079 & 10.031 \\ \hline
-\end{tabular}
-}
 
-\begin{tabular}{|l|r|r|r|r|r|r|}
+\begin{tabular}{|l|c|r|r|}
 \hline
-\multirow{2}{*}{} & \multicolumn{3}{c|}{idle} & \multicolumn{3}{c|}{cpu-stressed} \\ \cline{2-7} 
- & \multicolumn{1}{l|}{min} & \multicolumn{1}{l|}{avg} & \multicolumn{1}{l|}{max} & \multicolumn{1}{l|}{min} & \multicolumn{1}{l|}{avg} & \multicolumn{1}{l|}{max} \\ \hline
-Mainline Linux & 39 & 43 & 1046 & 39 & 52 & 1097 \\ \hline
-Preempt-RT & 16 & 21 & 52 & 18 & 25 & 62 \\ \hline
-Xenomai 2 & 8 & 9 & 41 & 8 & 19 & 45 \\ \hline
-Xenomai 3 & 7 & 7 & 35 & 6 & 16 & 37 \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
+ & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} \\ \hline
+Xenomai 2 & 8.541 & 9.458 & 34.583 \\ \hline
+Xenomai 3 & 8.043 & 8.853 & 33.023 \\ \hline
+& \multicolumn{3}{c|}{kernel}      \\ \hline
+Xenomai 2 & 6.965 & 7.708 & 27.821 \\ \hline
+Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
+& \multicolumn{3}{c|}{timer-irq}   \\ \hline
+Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
+Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
+\end{tabular}
+
+
+\begin{tabular}{|l|r|r|r|}
+\hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{idle}  \\ \cline{2-4} 
+ & \multicolumn{1}{l|}{min} & \multicolumn{1}{l|}{avg} & \multicolumn{1}{l|}{max} \\ \hline
+Mainline Linux & 39 & 43 & 1046  \\ \hline
+Preempt-RT & 16 & 21 & 52 \\ \hline
+Xenomai 2 & 8 & 9 & 41 \\ \hline
+Xenomai 3 & 7 & 7 & 35 \\ \hline
+ & \multicolumn{3}{c|}{cpu-stressed} \\ \hline
+Mainline Linux & 39 & 52 & 1097 \\ \hline
+Preempt-RT & 18 & 25 & 62 \\ \hline
+Xenomai 2 & 8 & 19 & 45 \\ \hline
+Xenomai 3 & 6 & 16 & 37 \\ \hline
 \end{tabular}
 
 
