@@ -152,6 +152,7 @@ Four distinct kernel configurations are used for the experiment, as summarized i
 
 Kernel conﬁguration options are mostly left as default. However, some of the options may have an impact on real-time latencies. These options include all options under CPU Power Management, APM support, and Opportunistic sleep. Additionally, most debug options in Kernel hacking section lead to increased latencies. Those options are turned off before compilation.
 
+
 \begin{tabular}{|l| p{3cm} |l|}
 \hline
 Kernel & Patches & source\\ \hline
@@ -159,6 +160,7 @@ mainline   & none & n/a \\ \hline
 PREEMPT\_RT & patch-3.14.39-rt37 & \cite{p-rt} \\ \hline
 Xenomai 2  & ipipe-core-3.14.39-arm-9 + xenomai v2.6.4 (2015-07-13 HEAD) & \cite{p-ipipe} \cite{git-x2.6} \\ \hline
 Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0  & \cite{p-ipipe} \cite{git-x3} \\ \hline
+\label{table:config}
 \end{tabular}
 
 \subsubsection{Pre-experiment Settings}
@@ -191,28 +193,44 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 \label{cyclictest-idle}
 \end{center}
 \end{figure}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=8cm]{img/cyclictest_stress.jpg}
 \caption{Cyclictest with stress.}
-\label{cyclictest-tress}
+\label{cyclictest-stress}
 \end{center}
 \end{figure}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/latency_idle.jpg}
-\caption{Latency with no stress.}
-\label{latency-idle}
+\includegraphics[width=8cm]{img/x2-idle.png}
+\caption{Latency with no stress on Xenomai-2.}
+\label{x2-latency-idle}
 \end{center}
 \end{figure}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/latency_stress.jpg}
-\caption{Latency with no stress.}
-\label{latency-stress}
+\includegraphics[width=8cm]{img/x2-cpu.png}
+\caption{Latency with stress on Xenomai-2.}
+\label{x2-latency-stress}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/x3-idle.png}
+\caption{Latency with no stress on Xenomai-3.}
+\label{x3-latency-idle}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/x3-cpu.png}
+\caption{Latency with stress on Xenomai-3.}
+\label{x3-latency-stress}
 \end{center}
 \end{figure}
 
