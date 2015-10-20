@@ -137,21 +137,16 @@ void myRealTimeTask(void *arg) {
 The \verb+SetPeriodic()+ function creates and starts a timer related to the calling task, with a period (in clock ticks) equals to the specified parameter. The global tick management function notifies the timer each time a clock tick occurs. When reaching wake up time, the timer executes a handler placing the task in the ready state.
 
 \section{Experiment}
-
-\subsection{Purpose}
-1. Compare the performance of Xenomai with baseline Linux kernel and PREEMPT\_RT patched kernel
-2. Compare the performance of Xenomai-2 and Xenomai-3
+There are two objectives we wish to complete in our experiment. First, compare the performance of Xenomai with baseline Linux kernel and PREEMPT\_RT patched kernel to decide which configuration has better realtime capability. Second, try to validate whether Xenomai-3 has improved its realtime performance. The details are described in following sub-chapters. 
 \subsection{Environment Setup}
-
+Because building and transporting operating systems on embedded devices is complicated. In order for other people to re-do the experiment, it needs proper setup and documentation. We will elaborate on different parts of the experiment setup. 
 \subsubsection{Hardware}
 For the testing platform, we used the BeagleBone Black. BeagleBone Black is an effective embedded platform with ARM Cortex-A8 processor, capable of running Linux and Xenomai (both 2 and 3), consisting of a single processor, a 512 MB memory, 32kB L1 caches and a 256kB L2 cache.  
-
 \subsubsection{Linux Kernel}
 We installed a Debian Linux image\cite{debian} on the beaglebone, with hardware-specific linux kernel from\cite{kernel}. Kernel version 3.14.39 were chosen due to it's compatibility with all kernel configurations.
 Four distinct kernel configurations are used for the experiment, as summarized in table\ref{table:config}. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
 
 Kernel conﬁguration options are mostly left as default. However, some of the options may have an impact on real-time latencies. These options include all options under CPU Power Management, APM support, and Opportunistic sleep. Additionally, most debug options in Kernel hacking section lead to increased latencies. Those options are turned off before compilation.
-
 
 \begin{tabular}{|l| p{3cm} |l|}
 \hline
@@ -166,7 +161,7 @@ Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0  & \cite{p-ipipe} \cite{git
 \subsubsection{Pre-experiment Settings}
 We tried to measure the latencies under 2 conditions - IDLE and CPU-STRESSED. In the IDLE experiment, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also killed, and we used the 'stress' command to keep the CPU busy. The command to kill these processes are written in the test script.
 
-  The gravity values is the shortest time the platform needs to deliver an IRQ to a Xenomai interrupt handler,  a RTDM task running in kernel space, or a user-space task. It is used to differentiate timers on the target context they activate, among IRQ(handler), kernel and user threads, anticipating the next timer shot accordingly, so that such context is activated as close as possible to the ideal time. The gravity values can be set in the file \begin{verbatim}/proc/xenomai/latency on Xenomai-2, /proc/xenomai/clock/coreclk
+  The gravity values is the shortest time the platform needs to deliver an IRQ to a Xenomai interrupt handler,  a RTDM task running in kernel space, or a user-space task. It is used to differentiate timers on the target context they activate, among IRQ(handler), kernel and user threads, anticipating the next timer shot accordingly, so that such context is activated as close as possible to the ideal time. The gravity values can be set in the file \begin{verbatim}/proc/xenomai/latency\end{verbatim} on Xenomai-2, and in the file \begin{verbatim}/proc/xenomai/clock/coreclk
 \end{verbatim} on Xenomai-3 with root privilege. Furthermore, Xenomai-3 has an autotune function that runs a series of internal calibration tests for estimating the most appropriate gravity values for its real-time clock timer, retaining the final values.
 Because Xenomai-2 doesn't have an autotune function and it has only one gravity value for all the 
 coreclocks, we decided to manually tune all the coreclock values in both Xenomai-2 and Xenomai-3 to zero, so that we can later compare the results on the same basis. 
@@ -188,7 +183,7 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 \subsection{Experiment Result}
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/cyclictest_idle.jpg}
+\includegraphics[width=6cm]{img/cyclictest_idle.jpg}
 \caption{Cyclictest with no stress.}
 \label{cyclictest-idle}
 \end{center}
@@ -196,7 +191,7 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/cyclictest_stress.jpg}
+\includegraphics[width=6cm]{img/cyclictest_stress.jpg}
 \caption{Cyclictest with stress.}
 \label{cyclictest-stress}
 \end{center}
@@ -204,7 +199,7 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/x2-idle.png}
+\includegraphics[width=6cm]{img/x2-idle.png}
 \caption{Latency with no stress on Xenomai-2.}
 \label{x2-latency-idle}
 \end{center}
@@ -212,7 +207,7 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/x2-cpu.png}
+\includegraphics[width=6cm]{img/x2-cpu.png}
 \caption{Latency with stress on Xenomai-2.}
 \label{x2-latency-stress}
 \end{center}
@@ -220,7 +215,7 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/x3-idle.png}
+\includegraphics[width=6cm]{img/x3-idle.png}
 \caption{Latency with no stress on Xenomai-3.}
 \label{x3-latency-idle}
 \end{center}
@@ -228,16 +223,12 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=8cm]{img/x3-cpu.png}
+\includegraphics[width=6cm]{img/x3-cpu.png}
 \caption{Latency with stress on Xenomai-3.}
 \label{x3-latency-stress}
 \end{center}
 \end{figure}
-
-\epsin{cyclic-idle}{80}{fig2:f2}{Cyclictest Idle}
-\epsin{cyclic-cpu}{80}{fig3:f3}{Cyclictest stressed}
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{|l|c|r|r|}
 \hline
 \multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
