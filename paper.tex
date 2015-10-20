@@ -138,42 +138,6 @@ void myRealTimeTask(void *arg) {
 
 The \verb+SetPeriodic()+ function creates and starts a timer related to the calling task, with a period (in clock ticks) equals to the specified parameter. The global tick management function notifies the timer each time a clock tick occurs. When reaching wake up time, the timer executes a handler placing the task in the ready state.
 
-The Gnublin mascot is the quadratic little man, adverting to the 
-7x7 cm board dimensions (fig. \ref{fig-maennchen}).
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=3cm]{img/gnublin-maennchen.jpg}
-\caption{The Gnublin mascot.}
-\label{fig-maennchen}
-\end{center}
-\end{figure}
-
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-\multirow{2}{*}{Multi-Row} &
-\multicolumn{2}{c|}{Multi-Column} &
-\multicolumn{2}{c|}{\multirow{2}{*}{Multi-Row and Col}} \\
-\cline{2-3}
-  & column-1 & column-2 & \multicolumn{2}{c|}{} \\
-\hline
-label-1 & label-2 & label-3 & label-4 & label-5 \\
-\hline
-\end{tabular}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% NEXT SECTION (OPTIONAL)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Hardware System Structure}
-Hardware structure of the recorder is shown as figure 1.The medium of data storage is several 10000RPM SCSI hard disks constituting RAID5.Hardware is based on 64-bit PCI bus, and Software is based on RTLinux and XFS.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% FIGURES ARE HANDLED LIKE THIS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% the figure will be in file rt-tux.eps and will occupy 75mm on the page
-\epsin{hsr}{80}{fig1:f1}{Hardware structure of Recorder}
-
-
 \section{Experiment}
 
 \subsection{Purpose}
@@ -185,9 +149,9 @@ Hardware structure of the recorder is shown as figure 1.The medium of data stora
 BeagleBone Black, an effective embedded platform with ARM Cortex-A8 processor, capable of running Linux and Xenomai (both 2 and 3), consisting of a single processor, a 512 MB memory, 32kB L1 caches and a 256kB L2 cache.  
 
 \subsubsection{Kernel}
-A Linux kernel that can be patched with PREEMPT\_RT, Xenomai 2 and Xenomai 3 is needed for the experiment (Xenomai 3 has to run on Linux kernel 3.10 or later versions). We selected Linux 3.14 for our experiment. In some cases when the patches couldn't be successfully applied on the kernel, we tried to resolve the conflicts manually.
+A Linux kernel that can be patched with PREEMPT\_RT, Xenomai 2 and Xenomai 3 is needed for the experiment (Xenomai 3 has to run on Linux kernel 3.10 or later versions). Linux 3.14 is selected for our experiment. In some cases when the patches couldn't be successfully applied on the kernel, we tried to resolve the conflicts manually.
   
-\subsubsection{Kernel configuration [ipipe]}
+\subsubsection{Kernel configuration }
 Some of the kernel conﬁguration options may have an impact on real-time latencies. These options include all options under CPU Power Management, APM support, and Opportunistic sleep. Additionally, most debug options in Kernel hacking section lead to increased latencies. Those options are disabled before compilation.
 
 \subsubsection{Pre-experiment Settings}
