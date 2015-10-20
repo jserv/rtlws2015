@@ -59,23 +59,17 @@ Performance Evaluation of Xenomai 3
 }
 
 \author{\large
-{\bf Ching-Chun (Jim) Huang }\\
+{\bf Ching-Chun (Jim) Huang, Che-Kang Wu }\\
 Department of Computer Science and Information Engineering, \\
 National Cheng Kung University, Taiwan\\
 No.1, University Road, Tainan City 701, Taiwan (R.O.C.)\\
 \vspace{8mm}
-jserv$@$ccns.ncku.edu.tw\\
+jserv$@$ccns.ncku.edu.tw, an4006048$@$mail.ncku.edu.tw\\
 {\bf Chan-Hsiang Lin}\\
 Department of Electrical and Electronic Engineering, National Taiwan University\\
 No.1, Sec. 4, Roosevelt Road, Taipei, Taiwan (R.O.C.)\\
-r04943031$@$ntu.edu.tw
-{\bf Che-Kang Wu}\\
-Department of Computer Science and Information Engineering, \\
-National Cheng Kung University, Taiwan\\
-No.1, University Road, Tainan City 701, Taiwan (R.O.C.)\\
 \vspace{8mm}
-an4006048$@$mail.ncku.edu.tw\\
-
+r04943031$@$ntu.edu.tw\\
 }
 \date{}
 
@@ -193,7 +187,8 @@ Some of the kernel conﬁguration options may have an impact on real-time latenc
 \subsubsection{Pre-experiment Settings}
 We tried to measure the latencies under 2 conditions - IDLE and CPU-STRESSED. In the IDLE experiment, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also killed, and we used the 'stress' command to keep the CPU busy. The command to kill these processes are written in the test script.
 
-  The gravity values is the shortest time the platform needs to deliver an IRQ to a Xenomai interrupt handler,  a RTDM task running in kernel space, or a user-space task. It is used to differentiate timers on the target context they activate, among IRQ(handler), kernel and user threads, anticipating the next timer shot accordingly, so that such context is activated as close as possible to the ideal time. The gravity values can be set in the file `/proc/xenomai/latency` on Xenomai-2, `/proc/xenomai/clock/coreclk` on Xenomai-3 with root privilege. Furthermore, Xenomai-3 has an autotune function that runs a series of internal calibration tests for estimating the most appropriate gravity values for its real-time clock timer, retaining the final values.
+  The gravity values is the shortest time the platform needs to deliver an IRQ to a Xenomai interrupt handler,  a RTDM task running in kernel space, or a user-space task. It is used to differentiate timers on the target context they activate, among IRQ(handler), kernel and user threads, anticipating the next timer shot accordingly, so that such context is activated as close as possible to the ideal time. The gravity values can be set in the file \begin{verbatim}/proc/xenomai/latency on Xenomai-2, /proc/xenomai/clock/coreclk
+\end{verbatim} on Xenomai-3 with root privilege. Furthermore, Xenomai-3 has an autotune function that runs a series of internal calibration tests for estimating the most appropriate gravity values for its real-time clock timer, retaining the final values.
 Because Xenomai-2 doesn't have an autotune function and it has only one gravity value for all the 
 coreclocks, we decided to manually tune all the coreclock values in both Xenomai-2 and Xenomai-3 to zero, so that we can later compare the results on the same basis. 
 
