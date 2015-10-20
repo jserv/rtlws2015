@@ -79,7 +79,7 @@ r04943031$@$ntu.edu.tw\\
 \maketitle
 
 \begin{abstract}
-Xenomai 3 is the new architecture of the real-time framework running seamlessly side-by-side Linux as a dual-kernel system like Xenomai 2, or natively over mainline Linux kernels supplemented by the PREEMPT\_RT efforts to meet stricter response time requirements than standard kernel preemption would bring. In this presentation, we will evaluate the performances of Xenomai 3 running with both configurations and analyze the various benchmarks for ARM Cortex-A series. Xenomai 3 introduces some optimizations over RTOS API emulation, thread-to-thread communications, and significantly lower overhead with dual-kernel configurations. The comprehensive performance comparisons illustrate the major evolution of Xenomai 3 along with the revised Real-Time Driver Model (RTDM) which provides a unified interface over both PREEMPT\_RT and dual-kernel.
+Xenomai 3 is the new architecture of the real-time framework running seamlessly side-by-side Linux as a dual-kernel system like Xenomai 2, or natively over mainline Linux kernels supplemented by the PREEMPT\_RT efforts to meet stricter response time requirements than standard kernel preemption would bring. In this presentation, we will evaluate the performances of Xenomai 3 running with dual-kernel configuration and analyze the various benchmarks for ARM Cortex-A series. Xenomai 3 introduces some optimizations over RTOS API emulation, thread-to-thread communications, and significantly lower overhead with dual-kernel configurations. The comprehensive performance comparisons illustrate the major evolution of Xenomai 3 along with the revised Real-Time Driver Model (RTDM) which provides a unified interface over both PREEMPT\_RT and dual-kernel.
 
 This paper would be a report on performance measurements among upstream Linux real-time enhancements and Xenomai official stable release (both version 2 and 3 series), and and the benchmarks show that the maximum response time to external interrupts of the dual kernel configurations for Xenomai 3 is almost twice as PPREEMPT\_RT, that more predictable handling on multiple incoming interrupts where Xenomai 3 supports both configurations interchangeably.
 \end{abstract}
@@ -132,42 +132,6 @@ void myRealTimeTask(void *arg) {
 
 The \verb+SetPeriodic()+ function creates and starts a timer related to the calling task, with a period (in clock ticks) equals to the specified parameter. The global tick management function notifies the timer each time a clock tick occurs. When reaching wake up time, the timer executes a handler placing the task in the ready state.
 
-The Gnublin mascot is the quadratic little man, adverting to the 
-7x7 cm board dimensions (fig. \ref{fig-maennchen}).
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=3cm]{img/gnublin-maennchen.jpg}
-\caption{The Gnublin mascot.}
-\label{fig-maennchen}
-\end{center}
-\end{figure}
-
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-\multirow{2}{*}{Multi-Row} &
-\multicolumn{2}{c|}{Multi-Column} &
-\multicolumn{2}{c|}{\multirow{2}{*}{Multi-Row and Col}} \\
-\cline{2-3}
-  & column-1 & column-2 & \multicolumn{2}{c|}{} \\
-\hline
-label-1 & label-2 & label-3 & label-4 & label-5 \\
-\hline
-\end{tabular}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% NEXT SECTION (OPTIONAL)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Hardware System Structure}
-Hardware structure of the recorder is shown as figure 1.The medium of data storage is several 10000RPM SCSI hard disks constituting RAID5.Hardware is based on 64-bit PCI bus, and Software is based on RTLinux and XFS.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% FIGURES ARE HANDLED LIKE THIS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% the figure will be in file rt-tux.eps and will occupy 75mm on the page
-\epsin{hsr}{80}{fig1:f1}{Hardware structure of Recorder}
-
-
 \section{Experiment}
 
 \subsection{Purpose}
@@ -176,13 +140,22 @@ Hardware structure of the recorder is shown as figure 1.The medium of data stora
 \subsection{Environment Setup}
 
 \subsubsection{Hardware}
-BeagleBone Black, an effective embedded platform with ARM Cortex-A8 processor, capable of running Linux and Xenomai (both 2 and 3), consisting of a single processor, a 512 MB memory, 32kB L1 caches and a 256kB L2 cache.  
+For the testing platform, we used the BeagleBone Black. BeagleBone Black is an effective embedded platform with ARM Cortex-A8 processor, capable of running Linux and Xenomai (both 2 and 3), consisting of a single processor, a 512 MB memory, 32kB L1 caches and a 256kB L2 cache.  
 
-\subsubsection{Kernel}
-A Linux kernel that can be patched with PREEMPT\_RT, Xenomai 2 and Xenomai 3 is needed for the experiment (Xenomai 3 has to run on Linux kernel 3.10 or later versions). We selected Linux 3.14 for our experiment. In some cases when the patches couldn't be successfully applied on the kernel, we tried to resolve the conflicts manually.
-  
-\subsubsection{Kernel configuration [ipipe]}
-Some of the kernel conﬁguration options may have an impact on real-time latencies. These options include all options under CPU Power Management, APM support, and Opportunistic sleep. Additionally, most debug options in Kernel hacking section lead to increased latencies. Those options are disabled before compilation.
+\subsubsection{Linux Kernel}
+We installed a Debian Linux image\cite{debian} on the beaglebone, with hardware-specific linux kernel from\cite{kernel}. Kernel version 3.14.39 were chosen due to it's compatibility with all kernel configurations.
+Four distinct kernel configurations are used for the experiment, as summarized in table\ref{table:config}. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
+
+Kernel conﬁguration options are mostly left as default. However, some of the options may have an impact on real-time latencies. These options include all options under CPU Power Management, APM support, and Opportunistic sleep. Additionally, most debug options in Kernel hacking section lead to increased latencies. Those options are turned off before compilation.
+
+\begin{tabular}{|l| p{3cm} |l|}
+\hline
+Kernel & Patches & source\\ \hline
+mainline   & none & n/a \\ \hline
+PREEMPT\_RT & patch-3.14.39-rt37 & \cite{p-rt} \\ \hline
+Xenomai 2  & ipipe-core-3.14.39-arm-9 + xenomai v2.6.4 (2015-07-13 HEAD) & \cite{p-ipipe} \cite{git-x2.6} \\ \hline
+Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0  & \cite{p-ipipe} \cite{git-x3} \\ \hline
+\end{tabular}
 
 \subsubsection{Pre-experiment Settings}
 We tried to measure the latencies under 2 conditions - IDLE and CPU-STRESSED. In the IDLE experiment, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also killed, and we used the 'stress' command to keep the CPU busy. The command to kill these processes are written in the test script.
@@ -288,6 +261,12 @@ We had done the test that  under the same hard platform, the recording speed has
 \begin{thebibliography}{9}%use this if you have <=9 bib refs
 	\bibitem {rtai}{\it https://www.rtai.org/}
 	\bibitem {sel4}{\it http://ssrg.nicta.com.au/projects/seL4/}
+	\bibitem {debian}{\it http://debian.beagleboard.org/images/bone-debian-7.5-2014-05-14-2gb.img.xz}
+	\bibitem {kernel}{\it https://github.com/beagleboard/linux}
+	\bibitem {p-rt}{\it https://www.kernel.org/pub/linux/kernel/projects/rt/3.14/}
+	\bibitem {p-ipipe}{\it http://download.gna.org/adeos/patches/v3.x/arm/ipipe-core-3.14.39-arm-9.patch}
+	\bibitem {git-x2.6}{\it http://git.xenomai.org/xenomai-2.6.git/}
+	\bibitem {git-x3}{\it http://git.xenomai.org/xenomai-3.git/}
 \end{thebibliography}
 
 \end{multicols}
