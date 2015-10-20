@@ -144,19 +144,19 @@ Because building and transporting operating systems on embedded devices is compl
 For the testing platform, we used the BeagleBone Black. BeagleBone Black is an effective embedded platform with ARM Cortex-A8 processor, capable of running Linux and Xenomai (both 2 and 3), consisting of a single processor, a 512 MB memory, 32kB L1 caches and a 256kB L2 cache.  
 \subsubsection{Linux Kernel}
 We installed a Debian Linux image\cite{debian} on the beaglebone, with hardware-specific linux kernel from\cite{kernel}. Kernel version 3.14.39 were chosen due to it's compatibility with all kernel configurations.
-Four distinct kernel configurations are used for the experiment, as summarized in table\ref{table:config}. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
+Four distinct kernel configurations are used for the experiment, as summarized in table below. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
 
 Kernel conﬁguration options are mostly left as default. However, some of the options may have an impact on real-time latencies. These options include all options under CPU Power Management, APM support, and Opportunistic sleep. Additionally, most debug options in Kernel hacking section lead to increased latencies. Those options are turned off before compilation.
 
 \begin{tabular}{|l| p{3cm} |l|}
 \hline
-Kernel & Patches & source\\ \hline
+Kernel & Patches & Source\\ \hline
 mainline   & none & n/a \\ \hline
 PREEMPT\_RT & patch-3.14.39-rt37 & \cite{p-rt} \\ \hline
 Xenomai 2  & ipipe-core-3.14.39-arm-9 + xenomai v2.6.4 (2015-07-13 HEAD) & \cite{p-ipipe} \cite{git-x2.6} \\ \hline
 Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0  & \cite{p-ipipe} \cite{git-x3} \\ \hline
-\label{table:config}
-\end{tabular}
+\end{tabular}\\
+
 
 \subsubsection{Pre-experiment Settings}
 We tried to measure the latencies under 2 conditions - IDLE and CPU-STRESSED. In the IDLE experiment, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also killed, and we used the 'stress' command to keep the CPU busy. The command to kill these processes are written in the test script.
@@ -227,7 +227,7 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 \caption{Latency with stress on Xenomai-3.}
 \label{x3-latency-stress}
 \end{center}
-\end{figure}
+\end{figure} 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{|l|c|r|r|}
 \hline
@@ -241,9 +241,9 @@ Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
 & \multicolumn{3}{c|}{timer-irq}   \\ \hline
 Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
 Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
-\end{tabular}
-
-
+\end{tabular} \\
+Table 1: cyclictest result on different kernel setups, in microseconds\\
+%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{|l|r|r|r|}
 \hline
 \multirow{2}{*}{} & \multicolumn{3}{c|}{idle}  \\ \cline{2-4} 
@@ -257,7 +257,10 @@ Mainline Linux & 39 & 52 & 1097 \\ \hline
 Preempt-RT & 18 & 25 & 62 \\ \hline
 Xenomai 2 & 8 & 19 & 45 \\ \hline
 Xenomai 3 & 6 & 16 & 37 \\ \hline
-\end{tabular}
+\end{tabular}\\
+Table 2: latency result on different kernel setups, in microseconds\\
+
+
 
 
 From the data above, it shows that the latency performance of timer-irq in CPU-STRESSED situation is slightly worse on Xenomai-3(over 3 us) than on Xenomai-2(below 3 us). While this is not an occasional case(the same experiment was ran a couple times), we tried to look into the test code of latency to figure out the cause of this phenomenon.
