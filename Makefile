@@ -2,8 +2,8 @@ all:	paper.pdf
 
 paper.pdf: paper.tex
 	pdflatex $^
-	bibtex paper || echo
-	pdflatex $^
+	bibtex paper >/dev/null || echo
+	pdflatex $^ 2>/dev/null >/dev/null
 
 edit:
 	texmaker paper.tex &

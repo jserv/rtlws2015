@@ -85,59 +85,69 @@ No.1, Sec. 4, Roosevelt Road, Taipei, Taiwan (R.O.C.)}
 \begin{abstract}
 Xenomai 3 is the new architecture of the real-time framework running seamlessly side-by-side Linux as a dual-kernel system like Xenomai 2, or natively over mainline Linux kernels supplemented by the PREEMPT\_RT efforts to meet stricter response time requirements than standard kernel preemption would bring. In this presentation, we will evaluate the performances of Xenomai 3 running with dual-kernel configuration and analyze the various benchmarks for ARM Cortex-A series. Xenomai 3 introduces some optimizations over RTOS API emulation, thread-to-thread communications, and significantly lower overhead with dual-kernel configurations. The comprehensive performance comparisons illustrate the major evolution of Xenomai 3 along with the revised Real-Time Driver Model (RTDM) which provides a unified interface over both PREEMPT\_RT and dual-kernel.
 
-This paper would be a report on performance measurements among upstream Linux real-time enhancements and Xenomai official stable release (both version 2 and 3 series), and and the benchmarks show that the maximum response time to external interrupts of the dual kernel configurations for Xenomai 3 is almost twice as PPREEMPT\_RT, that more predictable handling on multiple incoming interrupts where Xenomai 3 supports both configurations interchangeably.
+This paper would be a report on performance measurements between upstream Linux real-time enhancements and Xenomai official stable release (both version 2 and 3 series), and the benchmarks show that the maximum response time to external interrupts of the dual kernel configurations for Xenomai 3 is almost twice as PPREEMPT\_RT, that implies more predictable handling on multiple incoming interrupts where Xenomai 3 supports both configurations interchangeably.
 \end{abstract}
 
 \vspace{10mm}
 
 \begin{multicols}{2}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% SECTION (REQUIRED)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-Historically speaking, there are two typical approaches to modifying the standard Linux kernel into a real-time kernel. The first uses an extra small real-time executive \cite{rtai} or microkernel \cite{sel4} which runs the para-virtualized Linux kernel as a task. The small real-time executive takes control over the system for real-time processes and is responsible for scheduling real-time tasks, interrupt handling and scheduling Linux. With these changes it is possible to let a real-time task run on the CPU without the Linux kernel being able to interrupt the task. As the Linux kernel is run as a task it is preemptive at any time.
+The default Linux is designed to optimize for total system throughput, rather than for interactivity or the ability to perform real-time work. Historically speaking, there are two typical approaches to modifying the standard Linux kernel into a real-time kernel. The first introduces an extra small real-time executive \cite{rtai} or microkernel \cite{sel4} which runs the modified Linux kernel as a task. The small real-time executive, sometimes referred to \textit{co-kernel}, takes control over the system for real-time processes and is responsible for scheduling real-time tasks, interrupt handling and scheduling Linux. With these changes it is possible to let a real-time task run on the CPU without the Linux kernel being able to interrupt the task. As the Linux kernel is run as a task it is preemptive at any time.
 
-With the second approach, changes are made the Linux kernel in order to be real-time. This include changes as real-time
-scheduling and adding preemption to the kernel.
+Another approach is to make the Linux kernel itself more real-time by reducing the durations for which high-priority operations can be blocked, at the cost of reducing overall throughput. \textit{PREEMPT\_RT} \cite{linux-rt}, maintained separately from the Linux upstream, results in pure kernel implementation, and neither application programming interface (API) nor application binary interface (ABI) change is required. PREEMPT\_RT allows the use of existing Linux device drivers from real-time applications by making many spinlock-guarded regions preemptible, moving IRQ handlers into threads, and adding various other real-time features.
 
-In this section we briefly present the Xenomai real-time framework for Linux, and the Adaptive Domain Environment for Operating System (Adeos) layer, which allows Xenomai and Linux to run on the same hardware platform.
+In this section we briefly present the Xenomai \cite{xenomai} real-time framework for Linux, and its base real-time executive, Adaptive Domain Environment for Operating System (Adeos) nanokernel \cite{adeos}, which allows Xenomai and Linux to run on the same hardware.
 
-To provide an objective metric, we run processes on the test system, but measure their performance using an external measurement system which runs a C program on bare metal.
+\subsection{Adeos nanokernel}
 
-\subsection{Adeos layer}
+\textit{Adeos} is a resource virtualization layer, allowing multiple entities called \textit{domains}, which can compete with each other for receiving system generated \textit{events}. Those events can be incoming external (or virtually generated) interruptions, Linux system calls invocations, or various kernel-code-related events like context switches. Adeos introduces the \textit{event pipeline}, which can be seen as a chain of domains of decreasing priority. The events are consequently propagated throughout the pipeline, distributed firstly to the utmost priority domain, then distributed to lower priority domains.
 
-\textit{Adeos} is a resource virtualization layer, allowing multiple entities called \textit{domains}, that can be seen as complete operating systems, to run  simultaneously on the same hardware platform.
-
-Adeos domains can compete with each other for receiving system generated \textit{events}. Those events can be incoming external (or virtually generated) interruptions, Linux system calls invocations, or various kernel-code-related events like context switches. Adeos introduces the \textit{event pipeline}, which can be seen as a chain of domains of decreasing priority. The events are consequently propagated throughout the pipeline, distributed firstly to the utmost priority domain, then distributed to lower priority domains.
-
-In the case of a Xenomai RTOS running with a Linux kernel, the Adeos pipeline and the organization of the domains is depicted in Figure "EventPipeline". In the pipeline,  we can see that Xenomai has the highest priority, so it can handle and manage first the events before passing them to the Linux kernel. The events can also be blocked by the interrupt shield, preserving the real-time framework from latencies due to event management by the Linux kernel. Throughout this mechanism, Xenomai framework can provide real-time guarantees.
+Adeos is maintained by its I-pipe software. In Xenomai parlance, the I-pipe and Adeos both refer to the almost same code, that makes a Linux kernel able to host a secondary kernel exhibiting real-time properties (e.g. Xenomai), on the same hardware. I-pipe is a kernel patch applied to a regular Linux kernel, which among other services, guarantees delivery of external interrupts to Xenomai with very low latency. However, since Xenomai 3 supports PREEMPT\_RT, I-pipe is dependant only for running Xenomai in a dual kernel configuration.
 
 \subsection{Xenomai}
 
-Xenomai provides a kernel-based Application Programming Interface (API) for real-time applications. A user-land API is also available, at the cost of longer latencies. Xenomai introduces the concept of \textit{skins}. Skins are source codes emulating proprietary APIs used for porting real-time applications from various RTOSs such as \textit{VxWorks}, \textit{pSOS}, etc. to Xenomai. When designing a Xenomai application from scratch, the \textit{native} Xenomai skin can be used.
+Xenomai provides a kernel-based API for real-time applications. A user-space API is also available, at the cost of longer latencies. Xenomai introduces the concept of \textit{skins} \cite{ChameleonRTOS}, emulating proprietary APIs used for migrating real-time applications from various RTOSs like \textit{VxWorks}, \textit{pSOS}, \textit{VRTX}, etc. to Xenomai.
 
-All Xenomai skins rely on the \textit{nucleus}, the core of the RTOS, implementing all algorithms for real-time functionalities. Xenomai provides all standard services one can expect to find in a RTOS: task management, multiple scheduling algorithms, IPCs, etc.
+All Xenomai skins rely on the common the core of the RTOS, implementing all algorithms for real-time functionalities. Xenomai 3 provides all standard services one can expect to find in a classical RTOS such as handling interrupts and scheduling real-time threads, by means of two options: Cobalt and Mercury.
 
-\subsection{Time management in Xenomai}
-We focused in this project on periodic real-time tasks that make extensive use of timers. A commonly used skeleton for those tasks in Xenomai as follows :
+\subsection{Cobalt}
 
-%\vspace{-0.5cm}
-\begin{verbatim}
-void myRealTimeTask(void *arg) {
-  SetPeriodic(myself, period);
-  while(1) {
-    /* Do something */
-    wait_period();
-  }
-}
-\end{verbatim}
-%\vspace{-0.5cm}
+\textit{Cobalt}, distinguished in Xenomai 3, is the real-time extension, built into the Linux kernel, dealing with all time-critical activities on top of Adeos I-pipe. The Cobalt core has higher priority over the native kernel activities and has the same behaviour as what Xenomai 2 delivers real-time. For both Cobalt (as known as \textit{dual kernel} configurationin Xenomai 3) and Xenomai 2, the Linux kernel receives only virtual interrupt events, and those only after higher-priority software (e.g. the Xenomai layer) has had an opportunity to respond first. Similarly, when the Linux kernel blocks interrupt handlers, it does so only for itself; high-priority Xenomai threads will receive their events from the I-pipe on schedule.
 
-The \verb+SetPeriodic()+ function creates and starts a timer related to the calling task, with a period (in clock ticks) equals to the specified parameter. The global tick management function notifies the timer each time a clock tick occurs. When reaching wake up time, the timer executes a handler placing the task in the ready state.
+In the dual kernel configuration of Xenomai 3, all the RTOS APIs Xenomai provides interface with the Cobalt core, and only those APIs are deemed real-time capable, including the subset of POSIX 1003.1c \cite{posix-1003-1c} services implemented by \textit{libcobalt}, which was named after \textit{nucleus} in Xenomai 2.
 
-\section{Experiment}
-There are two objectives we wish to complete in our experiment. First, compare the performance of Xenomai with baseline Linux kernel and PREEMPT\_RT patched kernel to decide which configuration has better realtime capability. Second, try to validate whether Xenomai-3 has improved its realtime performance. The details are described in following sub-chapters. 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/x3-cobalt.png}
+\caption{Xenomai 3 dual kernel configuration}
+\label{xenomai3-coblat}
+\end{center}
+\end{figure}
+
+
+\subsection{Mercury}
+
+\textit{Mercury} was derived on the past experiment, \textit{Xenomai/SOLO} project \cite{xenomai-solo}, as an intermediate step towards Xenomai 3. Xenomai/SOLO project was the clean-room re-implementation of the building blocks that connect an emulator with the underlaying RTOS with special respect to the requirements and semantics of the native Linux kernel. The VxWorks emulator was the first one built over the Xenomai/SOLO project, as proof of concept (PoC), providing the VxWorks core API that can be used to port existing VxWorks applications to native Linux.
+
+Xenomai 2 provides skins to emulate traditional RTOS, such as VxWorks and pSOS, and a number of projects have been migrated smoothly from one of the supported traditional RTOS to Xenomai. In order to use a similar approach to migrate traditional RTOS projects to native Linux as well, Xenomai 3.x was launched. Thus, the single kernel configuration, Mercury, in Xenomai 3 does rely on the real-time capabilities of the native Linux kernel. Often, applications will require the PREEMPT\_RT extension to be enabled in the target kernel, for delivering real-time services.
+
+PREEMPT\_RT is not mandatory, however, and Mercury depends on the application requirements with respect to responsiveness and maximum jitter; some may even tolerate a certain percentage of deadline misses.
+
+In this single kernel configuration, all the non-POSIX RTOS APIs Xenomai provides are accurately emulated over the native threading library (preferably NPTL).
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=8cm]{img/x3-mercury.png}
+\caption{Xenomai 3 single kernel configuration}
+\label{xenomai3-coblat}
+\end{center}
+\end{figure}
+
+Xenomai 3 offers both dual-kernel and native option, and it deploys same Alchemy \cite{x3-applications} API on Cobalt/I-pipe and PREEMPT\_RT. Xenomai 3 was designed for tight latency requirement, configuration flexibility, and system compatibility.
+
+\section{Performance Evaluation}
+There are two objectives for performance evaluations. First, compare the performance of Xenomai with baseline Linux kernel and PREEMPT\_RT patched kernel to decide which configuration has better realtime capability. Second, try to validate whether Xenomai-3 has improved its realtime performance. The details are described in following sub-chapters. 
 \subsection{Environment Setup}
 Because building and transporting operating systems on embedded devices is complicated. In order for other people to re-do the experiment, it needs proper setup and documentation. We will elaborate on different parts of the experiment setup. 
 \subsubsection{Hardware}
@@ -276,6 +286,14 @@ We had done the test that  under the same hard platform, the recording speed has
 \begin{thebibliography}{9}%use this if you have <=9 bib refs
 	\bibitem {rtai}{\it https://www.rtai.org/}
 	\bibitem {sel4}{\it http://ssrg.nicta.com.au/projects/seL4/}
+	\bibitem {linux-rt}{\it http://git.kernel.org/cgit/linux/kernel/git/rt/}
+	\bibitem {xenomai}{\it http://xenomai.org/}
+	\bibitem {adeos} Karim Yaghmour. Adaptive Domain Environment for Operating Systems.\\
+	    \url{http://www.opersys.com/ftp/pub/Adeos/adeos.pdf}
+	\bibitem {ChameleonRTOS}{\it http://www.xenomai.org/documentation/slides/Xenomai-OSMB-2007-01.pdf}
+	\bibitem {posix-1003-1c}{\it http://standards.ieee.org/findstds/interps/1003-1c-95\_int/}
+	\bibitem {xenomai-solo}{\it https://www.osadl.org/Xenomai-SOLO.xenomai-solo.0.html}
+	\bibitem {x3-applications}{\it http://xenomai.org/running-applications-with-xenomai-3-x/}
 	\bibitem {debian}{\it http://debian.beagleboard.org/images/bone-debian-7.5-2014-05-14-2gb.img.xz}
 	\bibitem {kernel}{\it https://github.com/beagleboard/linux}
 	\bibitem {p-rt}{\it https://www.kernel.org/pub/linux/kernel/projects/rt/3.14/}
