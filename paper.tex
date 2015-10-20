@@ -154,7 +154,14 @@ Four distinct kernel configurations are used for the experiment, as summarized i
 
 Kernel conﬁguration options are mostly left as default. However, some of the options may have an impact on real-time latencies. These options include all options under CPU Power Management, APM support, and Opportunistic sleep. Additionally, most debug options in Kernel hacking section lead to increased latencies. Those options are turned off before compilation.
 
-% TODO : add config table
+\begin{tabular}{|l| p{3cm} |l|}
+\hline
+Kernel & Patches & source\\ \hline
+mainline   & none & n/a \\ \hline
+PREEMPT\_RT & patch-3.14.39-rt37 & \cite{p-rt} \\ \hline
+Xenomai 2  & ipipe-core-3.14.39-arm-9 + xenomai v2.6.4 (2015-07-13 HEAD) & \cite{p-ipipe} \cite{git-x2.6} \\ \hline
+Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0  & \cite{p-ipipe} \cite{git-x3} \\ \hline
+\end{tabular}
 
 \subsubsection{Pre-experiment Settings}
 We tried to measure the latencies under 2 conditions - IDLE and CPU-STRESSED. In the IDLE experiment, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also killed, and we used the 'stress' command to keep the CPU busy. The command to kill these processes are written in the test script.
@@ -261,6 +268,10 @@ We had done the test that  under the same hard platform, the recording speed has
 	\bibitem {sel4}{\it http://ssrg.nicta.com.au/projects/seL4/}
 	\bibitem {debian}{\it http://debian.beagleboard.org/images/bone-debian-7.5-2014-05-14-2gb.img.xz}
 	\bibitem {kernel}{\it https://github.com/beagleboard/linux}
+	\bibitem {p-rt}{\it https://www.kernel.org/pub/linux/kernel/projects/rt/3.14/}
+	\bibitem {p-ipipe}{\it http://download.gna.org/adeos/patches/v3.x/arm/ipipe-core-3.14.39-arm-9.patch}
+	\bibitem {git-x2.6}{\it http://git.xenomai.org/xenomai-2.6.git/}
+	\bibitem {git-x3}{\it http://git.xenomai.org/xenomai-3.git/}
 \end{thebibliography}
 
 \end{multicols}
