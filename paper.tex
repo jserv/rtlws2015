@@ -156,8 +156,7 @@ PREEMPT\_RT & patch-3.14.39-rt37 & \cite{p-rt} \\ \hline
 Xenomai 2  & ipipe-core-3.14.39-arm-9 + xenomai v2.6.4 (2015-07-13 HEAD) & \cite{p-ipipe} \cite{git-x2.6} \\ \hline
 Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0  & \cite{p-ipipe} \cite{git-x3} \\ \hline
 \end{tabular}\\
-
-
+Table 1: Different kernel configurations for the experiment\\
 \subsubsection{Pre-experiment Settings}
 We tried to measure the latencies under 2 conditions - IDLE and CPU-STRESSED. In the IDLE experiment, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also killed, and we used the 'stress' command to keep the CPU busy. The command to kill these processes are written in the test script.
 
@@ -229,21 +228,6 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 \end{center}
 \end{figure} 
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{tabular}{|l|c|r|r|}
-\hline
-\multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
- & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} \\ \hline
-Xenomai 2 & 8.541 & 9.458 & 34.583 \\ \hline
-Xenomai 3 & 8.043 & 8.853 & 33.023 \\ \hline
-& \multicolumn{3}{c|}{kernel}      \\ \hline
-Xenomai 2 & 6.965 & 7.708 & 27.821 \\ \hline
-Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
-& \multicolumn{3}{c|}{timer-irq}   \\ \hline
-Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
-Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
-\end{tabular} \\
-Table 1: cyclictest result on different kernel setups, in microseconds\\
-%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{|l|r|r|r|}
 \hline
 \multirow{2}{*}{} & \multicolumn{3}{c|}{idle}  \\ \cline{2-4} 
@@ -258,7 +242,22 @@ Preempt-RT & 18 & 25 & 62 \\ \hline
 Xenomai 2 & 8 & 19 & 45 \\ \hline
 Xenomai 3 & 6 & 16 & 37 \\ \hline
 \end{tabular}\\
-Table 2: latency result on different kernel setups, in microseconds\\
+Table 2: cyclictest result on different kernel setups, in microseconds\\
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tabular}{|l|c|r|r|}
+\hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
+ & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} \\ \hline
+Xenomai 2 & 8.541 & 9.458 & 34.583 \\ \hline
+Xenomai 3 & 8.043 & 8.853 & 33.023 \\ \hline
+& \multicolumn{3}{c|}{kernel}      \\ \hline
+Xenomai 2 & 6.965 & 7.708 & 27.821 \\ \hline
+Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
+& \multicolumn{3}{c|}{timer-irq}   \\ \hline
+Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
+Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
+\end{tabular} \\
+Table 3: latency result on different kernel setups, in microseconds\\
 
 
 
