@@ -48,7 +48,7 @@
 \newcounter{tabcounter}
 \def\tabin #1#2#3#4{
 \refstepcounter{tabcounter} \label{#2}
-\[ \makebox[#1mm][c]{#4} \]
+\[ \makebox[#1][c]{#4} \]
 %\vspace{0mm}
 \begin{center}
   \parbox{7cm}{{\bf TABLE \arabic{tabcounter}:}\quad {\it #3 } } \\
@@ -163,6 +163,7 @@ The kernel conﬁguration options are mostly following the default. However, som
 
 Four distinct Linux kernel configurations are used for the experiments, as summarized in table below. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
 
+\tabin{\columnwidth}{table:config}{Different kernel configurations for the experiment}{
 \begin{tabular}{|l| p{3cm} |l|}
 \hline
 Kernel & Patches & Source\\ \hline
@@ -170,9 +171,8 @@ mainline   & N/A & N/A \\ \hline
 PREEMPT\_RT & patch-3.14.39-rt37 & \cite{p-rt} \\ \hline
 Xenomai 2  & ipipe-core-3.14.39-arm-9 + xenomai v2.6.4 (Jul 13, 2015; HEAD) & \cite{p-ipipe} \cite{git-x2.6} \\ \hline
 Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0 (Oct 8, 2015) & \cite{p-ipipe} \cite{git-x3} \\ \hline
-\end{tabular}\\
-\vspace{4mm} \\
-Table 1: Different kernel configurations for the experiment\\
+\end{tabular}
+}
 
 \subsubsection{Prerequisites for Experiments}
 We tried to measure the latencies under 2 conditions: IDLE and CPU-STRESSED. In the IDLE condition, in order to create such test environment, some non-essential user processes were eliminated. While in the CPU-STRESSED condition, these process are also forcely killed, and we used the \textit{stress} \cite{stress} utility to keep the CPU busy. The commands to kill these processes are written in the test script.
@@ -257,6 +257,7 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 \end{center}
 \end{figure} 
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\tabin{\columnwidth}{table:cyclic}{cyclictest result on different kernel setups, in \textmu s}{
 \begin{tabular}{|l|r|r|r|}
 \hline
 \multirow{2}{*}{} & \multicolumn{3}{c|}{idle}  \\ \cline{2-4} 
@@ -270,11 +271,10 @@ Mainline Linux & 39 & 52 & 1097 \\ \hline
 Preempt-RT & 18 & 25 & 62 \\ \hline
 Xenomai 2 & 8 & 19 & 45 \\ \hline
 Xenomai 3 & 6 & 16 & 37 \\ \hline
-\end{tabular}\\
-\vspace{4mm} \\
-Table 2: cyclictest result on different kernel setups, in \textmu s\\
-\vspace{4mm} \\
+\end{tabular}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\tabin{\columnwidth}{table:latency-idle}{latency result on idle setup, in \textmu s}{
 \begin{tabular}{|l|c|r|r|}
 \hline
 \multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
@@ -287,11 +287,10 @@ Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
 & \multicolumn{3}{c|}{timer-irq}   \\ \hline
 Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
 Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
-\end{tabular} \\
-\vspace{4mm} \\
-Table 3: latency result on idle setup, in \textmu s\\
-\vspace{4mm} \\
+\end{tabular}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\tabin{\columnwidth}{table:latency-cpu}{latency result on cpu-stressed setup, in \textmu s}{
 \begin{tabular}{|l|c|r|r|}
 \hline
 \multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
@@ -304,10 +303,8 @@ Xenomai 3 & 5.334 & 9.424 & 27.564  \\ \hline
 & \multicolumn{3}{c|}{timer-irq}    \\ \hline
 Xenomai 2 & 2.089 & 2.927 & 14.430  \\ \hline
 Xenomai 3 & 2.544 & 3.246 & 18.026  \\ \hline
-\end{tabular} \\
-\vspace{4mm} \\
-Table 4: latency result on cpu-stressed setup, in \textmu s\\
-\vspace{4mm} \\
+\end{tabular}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 From the data above, it shows that the latency performance of timer-irq in CPU-STRESSED situation is slightly worse on Xenomai-3(over 3 us) than on Xenomai-2(below 3 us). While this is not an occasional case(the same experiment was ran a couple of times), we tried to look into the test code of latency to figure out the cause of this phenomenon. In user-level mode, the measurement task is carried out by the function 'latency' inside the program; whereas in kernel or irq mode, the task is executed by issuing a Xenomai RTDM command such as 
