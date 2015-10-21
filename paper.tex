@@ -25,24 +25,6 @@
 \setlength{\parindent}{6mm}
 \setlength{\parskip}{2mm}
 
-%% insert eps pictures
-%% use as \epsin{epsfile}{width_in_mm}{label}{caption}
-\usepackage{epsfig}
-\newcounter{figcounter}
-\def\epsin #1#2#3#4{
-\refstepcounter{figcounter} \label{#3}
-\[
-\mbox{
-  \epsfxsize=#2mm
-  \epsffile{#1.eps}
-}
-\]
-%\vspace{0mm}
-\begin{center}
-  \parbox{7cm}{{\bf FIGURE \arabic{figcounter}:}\quad {\it #4 } } \\
-\end{center}
-}
-
 %% insert table
 %% use as \tabin{size_in_mm}{label}{caption}{table_data}
 \newcounter{tabcounter}
