@@ -285,7 +285,7 @@ Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
 & \multicolumn{3}{c|}{timer-irq}   \\ \hline
 Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
 Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
-vspace{4mm} \\
+\vspace{4mm} \\
 \end{tabular} \\
 Table 3: latency result on different kernel setups, in \textmu s\\
 
@@ -301,7 +301,7 @@ Our data shows that the average user-level latency in either Xenomai 2 or 3 is a
 \section{Conclusions}
 We have evaluated the performance of two approaches to make Linux being real-time: PREEMPT\_RT and Xenomai, diversely presented in the view of single kernel and dual-kernel configurations on single-core ARM Cortex-A8, along with general conclusions about when each kernel configuration. As for the dual kernel configuration of Xenomai 3, latency is still significantly better, but PREEMPT\_RT shows closer performance at least for Linux kernel 3.14 stable release while it enables to run same application on different platforms and migrate existing POSIX application to Linux systems.
 
-The Linux kernel running under Xenomai 3 can be PREEMPT\_RT as well through the native option of Xenomai 3 for maximum API/ABI compatibility in real-time environments. For the tight latency requirements such as real-time networking, Xenomai 3 allows to switch to dual kernel configurations utilizing I-pipe for maximum real-time performance, which brings sligtly better performance than Xenomai 2. However, comparing to Xenomai 2, our results show the unexpected slowdown of timer irq latency in stressed condition while Xenomai 3 was configured as the dual kernel configuration.
+The Linux kernel running under Xenomai 3 can be PREEMPT\_RT as well, which means Linux ROOT gets currently running thread's priority through the native option of Xenomai 3 for maximum API/ABI compatibility in real-time environments. For the tight latency requirements such as real-time networking, Xenomai 3 allows to switch to dual kernel configurations utilizing I-pipe for maximum real-time performance, which brings sligtly better performance than Xenomai 2. However, comparing to Xenomai 2, our results show the unexpected slowdown of timer-irq latency in stressed condition while Xenomai 3 was configured as the dual kernel configuration of Xenomai 3 though. From our performance evaluation, Xenomai 3 is known as the most flexible real-time option.
 
 
 \bibliographystyle{unsrt}
