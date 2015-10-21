@@ -186,11 +186,13 @@ In our experiments, the kernel build were persistent in different SD/MMC media. 
 \subsection{Performance Evaluation}
 
 \subsubsection{Test scenario}
-The goal of the experiment is to evaluate the realtime performances of Mainline Linux, PREEMPT\_RT, 
-Xenomai-2 and Xenomai-3. Also, we want to find out whether the newly released Xenomai-3.0 has improved in realtime capability, compared to Xenomai-2.6.4, the latest stable version of Xenomai-2.
+The goal of the experiment is to evaluate the realtime performances of mainline Linux kernel, PREEMPT\_RT, 
+Xenomai 2 and Xenomai 3. Also, we want to find out whether the newly released Xenomai-3.0 has improved in realtime capability, compared to Xenomai-2.6.4, the latest stable version of Xenomai 2.
+
 \subsubsection{Tools}
 Cyclictest is a commonly-used latency benchmark. It is compatible with all the kernel setups we use (the recently Xenomai-3.0 release add cyclictest to its testsuite), therefore it's suitable for the purpose of measuring latencies for all setups.
 Latency is a test program for the Xenomai test suite. It can measure latencies under 3 modes - user task, kernel task, or timer IRQ. It launches the test procedure in one of the user-specified contexts. In the user mode, the measurement task is handled by the 'latency' function in the program, which periodically waits and fetches the current time when resuming. Latency is then measured by calculating the difference of the actual time elapsed with the predefined period.
+
 \subsubsection{Test Procedure}
 Each experiment was run on the same hardware. Each was run for 20 minutes to generate approximately 1,000,000 samples. Test scripts were written to facilitate the experiment process.
 \subsubsection{Test Load}
@@ -258,7 +260,7 @@ Preempt-RT & 18 & 25 & 62 \\ \hline
 Xenomai 2 & 8 & 19 & 45 \\ \hline
 Xenomai 3 & 6 & 16 & 37 \\ \hline
 \end{tabular}\\
-Table 2: cyclictest result on different kernel setups, in microseconds\\
+Table 2: cyclictest result on different kernel setups, in \textmu s\\
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{|l|c|r|r|}
 \hline
@@ -273,10 +275,7 @@ Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
 Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
 Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
 \end{tabular} \\
-Table 3: latency result on different kernel setups, in microseconds\\
-
-
-
+Table 3: latency result on different kernel setups, in \textmu s\\
 
 From the data above, it shows that the latency performance of timer-irq in CPU-STRESSED situation is slightly worse on Xenomai-3(over 3 \textmu s) than on Xenomai-2(below 3 \textmu s). While this is not an occasional case(the same experiment was ran a couple times), we tried to look into the test code of latency to figure out the cause of this phenomenon.
 
