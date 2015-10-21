@@ -146,7 +146,7 @@ In this single kernel configuration, all the non-POSIX RTOS APIs Xenomai provide
 
 Xenomai 3 offers both dual-kernel and native option, and it deploys same Alchemy \cite{x3-applications} API on Cobalt/I-pipe and PREEMPT\_RT. Xenomai 3 was designed for tight latency requirement, configuration flexibility, and system compatibility.
 
-\section{Performance Evaluation}
+\section{Measurement system design}
 There are two objectives for performance evaluations. First, comparing the performance of Xenomai with mainline Linux kernel and PREEMPT\_RT to exploit the real-time capability from system view. Second, trying to quantize the performance improvements and potential degradation of Xenomai 3.
 
 \subsubsection{Hardware}
@@ -159,7 +159,7 @@ Debian GNU/Linux image 2014-05-14 \cite{debian} was installed on the BeagleBone 
 
 Four distinct Linux kernel configurations are used for the experiments, as summarized in table below. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
 
-The kernel conﬁguration options are mostly following the default. However, some of the default configuration may have an impact on real-time latencies, such as the ones about CPU Power Management, APM support, and opportunistic sleep. Additionally, most debugging facilities in Kernel hacking section lead to increased latencies. Those problematic options are turned off manually in advance.
+The kernel conﬁguration options are mostly following the default. However, some of the default configuration may have an impact on real-time latencies, such as the ones about CPU Power Management, APM support, and opportunistic sleep. Additionally, most debugging facilities in Kernel hacking section lead to increased latencies. Those problematic options are disabled manually during the whole experiments.
 
 \begin{tabular}{|l| p{3cm} |l|}
 \hline
@@ -172,18 +172,20 @@ Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0 (Oct 8, 2015) & \cite{p-ipi
 Table 1: Different kernel configurations for the experiment\\
 
 \subsubsection{Prerequisites for Experiments}
-We tried to measure the latencies under 2 conditions: IDLE and CPU-STRESSED. In the IDLE condition, in order to create such test environment, some redundant user processes were eliminated. While in the CPU-STRESSED condition, these process are also forcely killed, and we used the \textit{stress}\cite{stress} utility to keep the CPU busy. The command to kill these processes are written in the test script.
+We tried to measure the latencies under 2 conditions: IDLE and CPU-STRESSED. In the IDLE condition, in order to create such test environment, some non-essential user processes were eliminated. While in the CPU-STRESSED condition, these process are also forcely killed, and we used the \textit{stress} \cite{stress} utility to keep the CPU busy. The commands to kill these processes are written in the test script.
 
-  The gravity values is the shortest time the platform needs to deliver an IRQ to a Xenomai interrupt handler,  a RTDM task running in kernel space, or a user-space task. It is used to differentiate timers on the target context they activate, among IRQ(handler), kernel and user threads, anticipating the next timer shot accordingly, so that such context is activated as close as possible to the ideal time. The gravity values can be set in the file \begin{verbatim}/proc/xenomai/latency\end{verbatim} on Xenomai-2, and in the file \begin{verbatim}/proc/xenomai/clock/coreclk
-\end{verbatim} on Xenomai-3 with root privilege. Furthermore, Xenomai-3 has an autotune function that runs a series of internal calibration tests for estimating the most appropriate gravity values for its real-time clock timer, retaining the final values.
-Because Xenomai-2 doesn't have an autotune function and it has only one gravity value for all the 
-coreclocks, we decided to manually tune all the coreclock values in both Xenomai-2 and Xenomai-3 to zero, so that we can later compare the results on the same basis. 
+  The gravity values is the shortest time the platform needs to deliver an IRQ to a Xenomai interrupt handler, a RTDM task running in kernel space, or a user-space task. It is used to differentiate timers on the target context they activate, among IRQ (handlers), kernel and user threads, anticipating the next timer shot accordingly, so that such context is activated as close as possible to the ideal time. The gravity values can be set in the file \begin{verbatim}/proc/xenomai/latency
+\end{verbatim} on Xenomai 2, and in the file
+\begin{verbatim}/proc/xenomai/clock/coreclk
+\end{verbatim} on Xenomai 3 with root privilege. Furthermore, Xenomai 3 provides an \textit{autotune} tool running a series of internal calibration tests for estimating the most appropriate gravity values for its real-time clock timer, retaining the final values.
 
-In our experiments, the kernel build were stored in different SD cards. The fact that different external storage devices have different access specs could affect the result. In order to eliminate the uncertainties, and for the sake of preventing the test process's pages being swapped into disk, we locked all the test process's pages inside memory. In cyclictest, this achieved by specifying the '-m' option in the command. On the other hand, latency is already executed in a memory locked condition.
+Because Xenomai 2 does not provide the corresponding autotune tool, and it has only one gravity value for all the coreclocks, we decided to manually tune all the coreclock values in both Xenomai 2 and Xenomai 3 to zero, so that we can compare the results on the same basis later
 
-\subsection{Testing Process}
+In our experiments, the kernel build were persistent in different SD/MMC media. The fact that different external storage devices have different access speeds could affect the final results. In order to eliminate the uncertainties and prevent the test process' pages from being swapped into disk, we locked all the test processes' pages inside memory. While using \textit{cyclictest} tool, we can achieve by specifying the '-m' option along with the command. On the other hand, we exclude the known latency factors and execute programs within one memory locking condition.
 
-\subsubsection{Scenario}
+\subsection{Performance Evaluation}
+
+\subsubsection{Test scenario}
 The goal of the experiment is to evaluate the realtime performances of Mainline Linux, PREEMPT\_RT, 
 Xenomai-2 and Xenomai-3. Also, we want to find out whether the newly released Xenomai-3.0 has improved in realtime capability, compared to Xenomai-2.6.4, the latest stable version of Xenomai-2.
 \subsubsection{Tools}
@@ -306,7 +308,7 @@ We had done the test that  under the same hard platform, the recording speed has
 	\bibitem {p-ipipe}{\it http://download.gna.org/adeos/patches/v3.x/arm/ipipe-core-3.14.39-arm-9.patch}
 	\bibitem {git-x2.6}{\it http://git.xenomai.org/xenomai-2.6.git/}
 	\bibitem {git-x3}{\it http://git.xenomai.org/xenomai-3.git/}
-	\bibitem {stree}{\it http://people.seas.harvard.edu/~apw/stress/}
+	\bibitem {stress}{\it http://people.seas.harvard.edu/~apw/stress/}
 \end{thebibliography}
 
 \end{multicols}
