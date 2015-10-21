@@ -85,7 +85,7 @@ No.1, Sec. 4, Roosevelt Road, Taipei, Taiwan (R.O.C.)}
 \begin{abstract}
 Xenomai 3 is the new architecture of the real-time framework running seamlessly side-by-side Linux as a dual-kernel system like Xenomai 2, or natively over mainline Linux kernels supplemented by the PREEMPT\_RT efforts to meet stricter response time requirements than standard kernel preemption would bring. In this presentation, we will evaluate the performances of Xenomai 3 running with dual-kernel configuration and analyze the various benchmarks for ARM Cortex-A series. Xenomai 3 introduces some optimizations over RTOS API emulation, thread-to-thread communications, and significantly lower overhead with dual-kernel configurations. The comprehensive performance comparisons illustrate the major evolution of Xenomai 3 along with the revised Real-Time Driver Model (RTDM) which provides a unified interface over both PREEMPT\_RT and dual-kernel.
 
-This paper would be a report on performance measurements between upstream Linux real-time enhancements and Xenomai official stable release (both version 2 and 3 series), and the benchmarks show that the maximum response time to external interrupts of the dual kernel configurations for Xenomai 3 is almost twice as PPREEMPT\_RT, that implies more predictable handling on multiple incoming interrupts where Xenomai 3 supports both configurations interchangeably.
+This paper would be a report on performance measurements between upstream Linux real-time enhancements and Xenomai official stable release (both version 2 and 3 series), and the benchmarks show that the maximum response time to external interrupts of the dual kernel configurations for Xenomai 3 is still better than PPREEMPT\_RT, that implies more predictable handling on multiple incoming interrupts where Xenomai 3 supports both configurations interchangeably.
 \end{abstract}
 
 \vspace{10mm}
@@ -190,7 +190,9 @@ We prepared comprehensive statistics collection for the real-time performance re
 
 Since the single kernel configuration is built upon mainline kernel or PREEMPT\_RT, we do not have to measure its configuration separately because of the availability of PREEMPT\_RT in our benchmark matrix.
 
-In Xenomai 3, with the introduction of the \textit{Copperplate} interface, which mediates between the real-time API / emulator of given application uses, and the underlying real-time core. That is, applications are able to run in either environments without visible code change. We do not intend to measure the overhead of \textit{Copperplate} interface or its implementation for the sake of measuring the system-level performance rather than API-oriented emulation.
+In Xenomai 3, with the introduction of the \textit{Copperplate} interface, which mediates between the real-time API / emulator of given application uses, and the underlying real-time core. That is, applications are able to run in either environments without visible code change. 
+
+The default interfaces have switched to being POSIX-based (Copperplate library) in Xenomai 3, so all other real-time APIs (or skins) are implemented on top of this. In particular, the Xenomai 2 native API (now called Alchemy) is a skin, while the POSIX API has been promoted from a skin to the standard interface. We do not intend to measure the overhead of \textit{Copperplate} interface or its implementation for the sake of measuring the system-level performance rather than API-oriented emulation.
 
 \subsubsection{Performance Tools}
 \textit{Cyclictest}, maintained in \textit{rt-tests} \cite{rt-tests} package, is a commonly-used latency benchmark. It is compatible with all of the kernel setups we use (the recently Xenomai 3.0 release shipped with cyclictest in its testsuite), therefore it is suitable for the purpose of measuring latencies for all setups.
@@ -289,6 +291,9 @@ From the data above, it shows that the latency performance of timer-irq in CPU-S
 Our data shows that the average user-level latency in either Xenomai 2 or 3 is around 9 \textmu s in idle condition, 18 \textmu s in stressed condition. And in the worse case, the latency is below 50 \textmu s. Meanwhile, the latency of PREEMPT\_RT has a user-level latency more than 20 \textmu s, which means it can not guarantee a 50 \textmu s max latency (Actually in some cases the latency will exceed 100 \textmu s in stressed condition).  As for mainline Linux, the max latency easily exceeds 1 ms. When comparing the performance of Xenomai 3 to Xenomai 2, we can see that the statistics in cyclictest and latency test is slightly better, except for the case of timer-irq latency in stressed condition.
 
 \section{Conclusions}
+We have evaluated the performance of two approaches to make Linux being real-time: PREEMPT\_RT and Xenomai, diversely presented in the view of single kernel and dual-kernel configurations on single-core ARM Cortex-A8, along with general conclusions about when each kernel configuration. As for the dual kernel configuration of Xenomai 3, latency is still significantly better, but PREEMPT\_RT shows closer performance at least for Linux kernel 3.14 stable release while it enables to run same application on different platforms and migrate existing POSIX application to Linux systems.
+
+The Linux kernel running under Xenomai 3 can be PREEMPT\_RT as well, which means Linux ROOT gets currently running thread's priority through the native option of Xenomai 3 for maximum API/ABI compatibility in real-time environments. For the tight latency requirements such as real-time networking, Xenomai 3 allows to switch to dual kernel configurations utilizing I-pipe for maximum real-time performance. However, our results show some of the unexpected slowdown of Xenomai 3 comparing to Xenomai 2.
 
 
 \bibliographystyle{unsrt}
