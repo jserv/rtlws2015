@@ -181,7 +181,7 @@ We tried to measure the latencies under 2 conditions: IDLE and CPU-STRESSED. In 
 
 Because Xenomai 2 does not provide the corresponding autotune tool, and it has only one gravity value for all the coreclocks, we decided to manually tune all the coreclock values in both Xenomai 2 and Xenomai 3 to zero, so that we can compare the results on the same basis later
 
-In our experiments, the kernel build were persistent in different SD/MMC media. The fact that different external storage devices have different access speeds could affect the final results. In order to eliminate the uncertainties and prevent the test process' pages from being swapped into disk, we locked all the test processes' pages inside memory. While using \textit{cyclictest} tool, we can achieve by specifying the '-m' option along with the command. On the other hand, we exclude the known latency factors and execute programs within one memory locking condition.
+In our experiments, the kernel build were persistent in different SD/MMC media. The fact that different external storage devices have different access speeds could affect the final results. In order to eliminate the uncertainties and prevent the test process' pages from being swapped into disk, we locked all the test processes' pages inside memory. While using \textit{cyclictest} tool, we can achieve by specifying the '-m' option along with the command. On the other hand, we exclude the known latency factors and execute programs within the memory-locked environment.
 
 \subsection{Performance Evaluation}
 
