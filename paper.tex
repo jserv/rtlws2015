@@ -121,7 +121,7 @@ In the dual kernel configuration of Xenomai 3, all the RTOS APIs Xenomai provide
 \begin{center}
 \includegraphics[width=8cm]{img/x3-cobalt.png}
 \caption{Xenomai 3 dual kernel configuration}
-\label{xenomai3-coblat}
+\label{xenomai3-cobalt}
 \end{center}
 \end{figure}
 
@@ -140,7 +140,7 @@ In this single kernel configuration, all the non-POSIX RTOS APIs Xenomai provide
 \begin{center}
 \includegraphics[width=8cm]{img/x3-mercury.png}
 \caption{Xenomai 3 single kernel configuration}
-\label{xenomai3-coblat}
+\label{xenomai3-mercury}
 \end{center}
 \end{figure}
 
@@ -161,7 +161,7 @@ Both Xenomai 3 Coblat and Xenomai 2 are working on the same I-pipe software for 
 
 The kernel conﬁguration options are mostly following the default. However, some of the default configuration may have an impact on real-time latencies, such as the ones about CPU Power Management, APM support, and opportunistic sleep. Additionally, most debugging facilities in Kernel hacking section lead to increased latencies. Those problematic options are disabled manually during the whole experiments.
 
-Four distinct Linux kernel configurations are used for the experiments, as summarized in table below. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
+Four distinct Linux kernel configurations are used for the experiments, as summarized in table below \ref{table:config}. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
 
 \tabin{\columnwidth}{table:config}{Different kernel configurations for the experiment}{
 \begin{tabular}{|l| p{3cm} |l|}
