@@ -169,7 +169,7 @@ PREEMPT\_RT & patch-3.14.39-rt37 & \cite{p-rt} \\ \hline
 Xenomai 2  & ipipe-core-3.14.39-arm-9 + xenomai v2.6.4 (Jul 13, 2015; HEAD) & \cite{p-ipipe} \cite{git-x2.6} \\ \hline
 Xenomai 3  & ipipe-core-3.14.39-arm-9 + xenomai v3.0 (Oct 8, 2015) & \cite{p-ipipe} \cite{git-x3} \\ \hline
 \end{tabular}\\
-vspace{4mm} \\
+\vspace{4mm} \\
 Table 1: Different kernel configurations for the experiment\\
 
 \subsubsection{Prerequisites for Experiments}
@@ -269,9 +269,9 @@ Preempt-RT & 18 & 25 & 62 \\ \hline
 Xenomai 2 & 8 & 19 & 45 \\ \hline
 Xenomai 3 & 6 & 16 & 37 \\ \hline
 \end{tabular}\\
-vspace{4mm} \\
+\vspace{4mm} \\
 Table 2: cyclictest result on different kernel setups, in \textmu s\\
-vspace{4mm} \\
+\vspace{4mm} \\
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{|l|c|r|r|}
 \hline
@@ -296,7 +296,7 @@ RTTST_RTIOC_INTERM_BENCH_RES,&result);
 \end{verbatim} 
 in an infinite loop to periodically launch timer and capture latencies. Unfortunately, we were unable to discover the reason for the discrepancy on the observed data.
 \subsection{Experiment Result Analysis}
-Our data shows that the average user-level latency in either Xenomai 2 or 3 is around 9 \textmu s in idle condition, 18 \textmu s in stressed condition. And in the worse case, the latency is below 50 \textmu s. Meanwhile, the latency of PREEMPT\_RT has a user-level latency more than 20 \textmu s, which means it can not guarantee a 50 \textmu s max latency (Actually in some cases the latency will exceed 100 \textmu s in stressed condition).  As for mainline Linux, the max latency easily exceeds 1 ms. When comparing the performance of Xenomai 3 to Xenomai 2, we can see that the statistics in cyclictest and latency test is slightly better, except for the case of timer-irq latency in stressed condition.
+Our data shows that the average user-level latency in either Xenomai 2 or 3 is around 9 \textmu s in idle condition, 18 \textmu s in stressed condition. And in the worse case, the latency is below 50 \textmu s. Meanwhile, the latency of PREEMPT\_RT has an averaged user-level latency more than 20 \textmu s, which means it can not guarantee a 50 \textmu s max latency (Actually in some cases the latency will exceed 100 \textmu s in stressed condition).  As for mainline Linux, the max latency easily exceeds 1 ms. When comparing the performance of Xenomai 3 to Xenomai 2, we can see that the statistics in cyclictest and latency test is slightly better, except for the case of timer-irq latency in stressed condition.
 
 \section{Conclusions}
 We have evaluated the performance of two approaches to make Linux being real-time: PREEMPT\_RT and Xenomai, diversely presented in the view of single kernel and dual-kernel configurations on single-core ARM Cortex-A8, along with general conclusions about when each kernel configuration. As for the dual kernel configuration of Xenomai 3, latency is still significantly better, but PREEMPT\_RT shows closer performance at least for Linux kernel 3.14 stable release while it enables to run same application on different platforms and migrate existing POSIX application to Linux systems.
