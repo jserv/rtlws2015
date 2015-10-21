@@ -103,7 +103,7 @@ In this section we briefly present the Xenomai \cite{xenomai} real-time framewor
 
 \textit{Adeos} is a resource virtualization layer, allowing multiple entities called \textit{domains}, which can compete with each other for receiving system generated \textit{events}. Those events can be incoming external (or virtually generated) interruptions, Linux system calls invocations, or various kernel-code-related events like context switches. Adeos introduces the \textit{event pipeline}, which can be seen as a chain of domains of decreasing priority. The events are consequently propagated throughout the pipeline, distributed firstly to the utmost priority domain, then distributed to lower priority domains.
 
-Adeos is maintained by its \textit{I-pipe} software. In Xenomai parlance, the I-pipe and Adeos both refer to the almost same code, that makes a Linux kernel able to host a secondary kernel exhibiting real-time properties (e.g. Xenomai), on the same hardware. I-pipe is a kernel patch applied to a regular Linux kernel, which among other services, guarantees delivery of external interrupts to Xenomai with very low latency. However, since Xenomai 3 supports PREEMPT\_RT, I-pipe is dependant only for running Xenomai in a dual kernel configuration.
+Adeos is maintained by its I-pipe software. In Xenomai parlance, the I-pipe and Adeos both refer to the almost same code, that makes a Linux kernel able to host a secondary kernel exhibiting real-time properties (e.g. Xenomai), on the same hardware. I-pipe is a kernel patch applied to a regular Linux kernel, which among other services, guarantees delivery of external interrupts to Xenomai with very low latency. However, since Xenomai 3 supports PREEMPT\_RT, I-pipe is dependant only for running Xenomai in a dual kernel configuration.
 
 \subsection{Xenomai}
 
@@ -144,7 +144,7 @@ In this single kernel configuration, all the non-POSIX RTOS APIs Xenomai provide
 \end{center}
 \end{figure}
 
-Xenomai 3 offers both dual-kernel and native option, and it deploys same \textit{Alchemy} \cite{x3-applications} API on Cobalt/I-pipe and PREEMPT\_RT. Xenomai 3 was designed for tight latency requirement, configuration flexibility, and system compatibility.
+Xenomai 3 offers both dual-kernel and native option, and it deploys same Alchemy \cite{x3-applications} API on Cobalt/I-pipe and PREEMPT\_RT. Xenomai 3 was designed for tight latency requirement, configuration flexibility, and system compatibility.
 
 \section{Measurement system design}
 There are two objectives for performance evaluations. First, comparing the performance of Xenomai with mainline Linux kernel and PREEMPT\_RT to exploit the real-time capability from system view. Second, trying to quantize the performance improvements and potential degradation of Xenomai 3.
@@ -155,11 +155,11 @@ There are two objectives for performance evaluations. First, comparing the perfo
 Beaglebone Black is community-supported development platform, and active Linux kernel maintenance enables us to perform further experiments and participate in technical discussions. TI AM335x is used widely in industrial automation, providing an extensive, reliable solution portfolio ranging from robust microcontrollers to ARM based microprocessors.
 
 \subsubsection{Software Installation}
-Debian GNU/Linux image 2014-05-14 \cite{debian} was installed on the BeagleBone Black, with hardware-specific Linux kernel tree from official BeagleBone kernel repository \cite{kernel}. We selected kernel version 3.14.39 due to its compatibility with all kernel configurations after our early evaluations. Both Xenomai 3 Coblat and Xenomai 2 are working on the same I-pipe software for consistency.
-
-The kernel conﬁguration options are mostly following the default. However, some of the default configuration may have an impact on real-time latencies, such as the ones about CPU Power Management, APM support, and opportunistic sleep. Additionally, most debugging facilities in Kernel hacking section lead to increased latencies. Those problematic options are disabled manually during the whole experiments.
+Debian GNU/Linux image 2014-05-14 \cite{debian} was installed on the BeagleBone Black, with hardware-specific Linux kernel tree from official BeagleBone kernel repository \cite{kernel}. We selected kernel version 3.14.39 due to its compatibility with all kernel configurations after our early evaluations.
 
 Four distinct Linux kernel configurations are used for the experiments, as summarized in table below. Kernel are patched using git merge first, and remaining conflicts are resolved manually.
+
+The kernel conﬁguration options are mostly following the default. However, some of the default configuration may have an impact on real-time latencies, such as the ones about CPU Power Management, APM support, and opportunistic sleep. Additionally, most debugging facilities in Kernel hacking section lead to increased latencies. Those problematic options are disabled manually during the whole experiments.
 
 \begin{tabular}{|l| p{3cm} |l|}
 \hline
@@ -260,12 +260,12 @@ As previously mentioned, we measure latencies under IDLE and CPU-STRESSED condit
 \multirow{2}{*}{} & \multicolumn{3}{c|}{idle}  \\ \cline{2-4} 
  & \multicolumn{1}{l|}{min} & \multicolumn{1}{l|}{avg} & \multicolumn{1}{l|}{max} \\ \hline
 Mainline Linux & 39 & 43 & 1046  \\ \hline
-Preempt\_RT & 16 & 21 & 52 \\ \hline
+Preempt-RT & 16 & 21 & 52 \\ \hline
 Xenomai 2 & 8 & 9 & 41 \\ \hline
 Xenomai 3 & 7 & 7 & 35 \\ \hline
  & \multicolumn{3}{c|}{cpu-stressed} \\ \hline
 Mainline Linux & 39 & 52 & 1097 \\ \hline
-Preempt\_RT & 18 & 25 & 62 \\ \hline
+Preempt-RT & 18 & 25 & 62 \\ \hline
 Xenomai 2 & 8 & 19 & 45 \\ \hline
 Xenomai 3 & 6 & 16 & 37 \\ \hline
 \end{tabular}\\
@@ -285,25 +285,40 @@ Xenomai 3 & 5.567 & 6.479 & 25.577 \\ \hline
 & \multicolumn{3}{c|}{timer-irq}   \\ \hline
 Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
 Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
-\end{tabular}\\
+\end{tabular} \\
 \vspace{4mm} \\
-Table 3: latency result on different kernel setups, in \textmu s\\
-\vspace{4mm}
-
-From the data above, it shows that the latency performance of timer-irq in CPU-STRESSED situation is slightly worse on Xenomai 3 (over 3 \textmu s) than on Xenomai 2 (below 3 \textmu s). While this is not an occasional case, we already ensured the same experiment method was ran a couple of times, we tried to look into the test code of latency to figure out the cause of this phenomenon. In user-level mode, the measurement task is carried out by the function 'latency' inside the program; whereas in kernel or irq mode, the task is executed by issuing a Xenomai RTDM operation such as:
+Table 3: latency result on idle  setup, in \textmu s\\
+\vspace{4mm} \\
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tabular}{|l|c|r|r|}
+\hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
+ & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} \\ \hline
+Xenomai 2 & 9.291 & 18.666 & 41.624 \\ \hline
+Xenomai 3 & 8.296 & 18.406 & 44.644 \\ \hline
+& \multicolumn{3}{c|}{kernel}       \\ \hline
+Xenomai 2 & 6.584 & 10.833 & 30.588 \\ \hline
+Xenomai 3 & 5.334 & 9.424 & 27.564  \\ \hline
+& \multicolumn{3}{c|}{timer-irq}    \\ \hline
+Xenomai 2 & 2.089 & 2.927 & 14.430  \\ \hline
+Xenomai 3 & 2.544 & 3.246 & 18.026  \\ \hline
+\end{tabular} \\
+\vspace{4mm} \\
+Table 4: latency result on cpu-stressed setup, in \textmu s\\
+\vspace{4mm} \\
+From the data above, it shows that the latency performance of timer-irq in CPU-STRESSED situation is slightly worse on Xenomai-3(over 3 us) than on Xenomai-2(below 3 us). While this is not an occasional case(the same experiment was ran a couple of times), we tried to look into the test code of latency to figure out the cause of this phenomenon. In user-level mode, the measurement task is carried out by the function 'latency' inside the program; whereas in kernel or irq mode, the task is executed by issuing a Xenomai RTDM command such as 
 \begin{verbatim}
 rt_dev_ioctl(benchdev, \
 RTTST_RTIOC_INTERM_BENCH_RES,&result); 
 \end{verbatim} 
-in an infinite loop to periodically launch timer and capture latencies. Unfortunately, we were unable to discover the reason for the discrepancy on the observed data at that time.
-
+in an infinite loop to periodically launch timer and capture latencies. Unfortunately, we were unable to discover the reason for the discrepancy on the observed data.
 \subsection{Experiment Result Analysis}
-Our data shows that the average user-level latency in either Xenomai 2 or 3 is around 9 \textmu s in idle condition, 18 \textmu s in stressed condition. And in the worse case, the latency is below 50 \textmu s. Meanwhile, the latency of PREEMPT\_RT has an averaged user-level latency more than 20 \textmu s, which means it can not guarantee a 50 \textmu s max latency (Actually in some cases the latency will exceed 100 \textmu s in stressed condition).  As for mainline Linux, the max latency easily exceeds 1 ms. When comparing the performance between Xenomai 2 and Xenomai 3, we can see that the statistics in cyclictest and latency test would be slightly better, except for the case of timer-irq latency in stressed condition.
+Our data shows that the average user-level latency in either Xenomai 2 or 3 is around 9 \textmu s in idle condition, 18 \textmu s in stressed condition. And in the worse case, the latency is below 50 \textmu s. Meanwhile, the latency of PREEMPT\_RT has an averaged user-level latency more than 20 \textmu s, which means it can not guarantee a 50 \textmu s max latency (Actually in some cases the latency will exceed 100 \textmu s in stressed condition).  As for mainline Linux, the max latency easily exceeds 1 ms. When comparing the performance of Xenomai 3 to Xenomai 2, we can see that the statistics in cyclictest and latency test is slightly better, except for the case of timer-irq latency in stressed condition.
 
 \section{Conclusions}
-We have evaluated the performance of two approaches to make Linux being real-time: PREEMPT\_RT and Xenomai, diversely presented in the view of single kernel and dual-kernel configurations on single-core ARM Cortex-A8. As for the dual kernel configuration of Xenomai 3, latency is still significantly better, but PREEMPT\_RT shows closer performance at least for Linux kernel 3.14 stable release while it enables to run same application on different platforms and migrate existing POSIX application to Linux systems.
+We have evaluated the performance of two approaches to make Linux being real-time: PREEMPT\_RT and Xenomai, diversely presented in the view of single kernel and dual-kernel configurations on single-core ARM Cortex-A8, along with general conclusions about when each kernel configuration. As for the dual kernel configuration of Xenomai 3, latency is still significantly better, but PREEMPT\_RT shows closer performance at least for Linux kernel 3.14 stable release while it enables to run same application on different platforms and migrate existing POSIX application to Linux systems.
 
-The Linux kernel running under Xenomai 3 can be PREEMPT\_RT as well through the native option of Xenomai 3 for maximum API/ABI compatibility in real-time environments. For the tight latency requirements such as real-time networking, Xenomai 3 allows to switch to dual kernel configurations utilizing I-pipe for maximum real-time performance, which brings sligtly better performance than Xenomai 2 in general. However, comparing to Xenomai 2, our results show the unexpected slowdown of timer interrupt hanlding latency in stressed condition while Xenomai 3 was configured as the dual kernel configuration of Xenomai 3 though. It is not clear why Cobalt in Xenomai 3 contributes to larger interrupt jitter when the CPU is heavily loaded. This needs further investigation.
+The Linux kernel running under Xenomai 3 can be PREEMPT\_RT as well, which means Linux ROOT gets currently running thread's priority through the native option of Xenomai 3 for maximum API/ABI compatibility in real-time environments. For the tight latency requirements such as real-time networking, Xenomai 3 allows to switch to dual kernel configurations utilizing I-pipe for maximum real-time performance, which brings sligtly better performance than Xenomai 2. However, comparing to Xenomai 2, our results show the unexpected slowdown of timer-irq latency in stressed condition while Xenomai 3 was configured as the dual kernel configuration of Xenomai 3 though. From our performance evaluation, Xenomai 3 is known as the most flexible real-time option.
 
 
 \bibliographystyle{unsrt}
