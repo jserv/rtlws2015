@@ -287,7 +287,27 @@ Xenomai 2 & 2.129 & 2.654 & 11.343 \\ \hline
 Xenomai 3 & 2.586 & 3.079 & 10.031 \\ \hline
 \end{tabular} \\
 \vspace{4mm} \\
-Table 3: latency result on different kernel setups, in \textmu s\\
+Table 3: latency result on idle setup, in \textmu s\\
+\vspace{4mm} \\
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tabular}{|l|c|r|r|}
+\hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{user} \\ \cline{2-4} 
+ & min & \multicolumn{1}{c|}{avg} & \multicolumn{1}{c|}{max} \\ \hline
+Xenomai 2 & 9.291 & 18.666 & 41.624 \\ \hline
+Xenomai 3 & 8.296 & 18.406 & 44.644 \\ \hline
+& \multicolumn{3}{c|}{kernel}       \\ \hline
+Xenomai 2 & 6.584 & 10.833 & 30.588 \\ \hline
+Xenomai 3 & 5.334 & 9.424 & 27.564  \\ \hline
+& \multicolumn{3}{c|}{timer-irq}    \\ \hline
+Xenomai 2 & 2.089 & 2.927 & 14.430  \\ \hline
+Xenomai 3 & 2.544 & 3.246 & 18.026  \\ \hline
+\end{tabular} \\
+\vspace{4mm} \\
+Table 4: latency result on cpu-stressed setup, in \textmu s\\
+\vspace{4mm} \\
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 From the data above, it shows that the latency performance of timer-irq in CPU-STRESSED situation is slightly worse on Xenomai-3(over 3 us) than on Xenomai-2(below 3 us). While this is not an occasional case(the same experiment was ran a couple of times), we tried to look into the test code of latency to figure out the cause of this phenomenon. In user-level mode, the measurement task is carried out by the function 'latency' inside the program; whereas in kernel or irq mode, the task is executed by issuing a Xenomai RTDM command such as 
 \begin{verbatim}
